@@ -366,7 +366,7 @@ public class RestConnection {
      * Also it can be used for tests to provide the correct contents.
      * This class in particular is used by the POST for the email configuration.
      * See the {@link #updateEmailConfiguration(int,
-     * de.uni_potsdam.hpi.bpt.bp2014.jcore.RestConnection.EmailConfigJaxBean)
+     * RestConnection.EmailConfigJaxBean)
      * updateEmailConfiguration} method for more information.
      */
     @XmlRootElement
