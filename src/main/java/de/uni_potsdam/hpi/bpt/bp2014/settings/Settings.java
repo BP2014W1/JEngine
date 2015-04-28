@@ -41,4 +41,6 @@ public class Settings {
     // FrontEnd Admin URL
     public static String frontendAdminServerUrl = "http://172.16.64.113/Frontend/admin/";
 
+    //Event input URL
+    public static String EventSubscriber = "http://172.16.64.113/Frontend/admin/";
 }
