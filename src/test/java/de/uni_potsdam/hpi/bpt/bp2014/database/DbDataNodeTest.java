@@ -1,21 +1,28 @@
 package de.uni_potsdam.hpi.bpt.bp2014.database;
 
 
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbDataNode;
+import de.uni_potsdam.hpi.bpt.bp2014.AbstractDatabaseDependentTest;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 /**
- * Created by jaspar.mang on 12.01.15.
+ *
  */
-public class DbDataNodeTest {
+public class DbDataNodeTest extends AbstractDatabaseDependentTest {
+    /**
+     *
+     */
     @Test
     public void testGetDataObjectIdsForDataSets(){
         DbDataNode dbDataNode = new DbDataNode();
         assertEquals(3, (int)dbDataNode.getDataObjectIdsForDataSets(11).get(0));
         assertEquals(4, (int)dbDataNode.getDataObjectIdsForDataSets(11).get(1));
     }
+
+    /**
+     *
+     */
     @Test
     public void testGetDataStatesForDataSets(){
         DbDataNode dbDataNode = new DbDataNode();

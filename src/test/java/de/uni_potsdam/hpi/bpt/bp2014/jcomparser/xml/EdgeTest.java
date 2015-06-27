@@ -1,8 +1,6 @@
 package de.uni_potsdam.hpi.bpt.bp2014.jcomparser.xml;
 
 import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import de.uni_potsdam.hpi.bpt.bp2014.jcomparser.xml.Edge;
-import de.uni_potsdam.hpi.bpt.bp2014.jcomparser.xml.Node;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,8 +56,8 @@ public class EdgeTest {
         source = new Node();
         source.setId(88478777L);
         nodes.put(88478777L, source);
-        dataFlowEdge.setControlNodes(nodes);
-        controlFlowEdge.setControlNodes(nodes);
+        dataFlowEdge.setNodes(nodes);
+        controlFlowEdge.setNodes(nodes);
     }
     // END: Set-Up
 

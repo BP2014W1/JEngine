@@ -8,6 +8,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 
+
+
 /**
  * This class implements the REST interface of the JEngine history.
  */
@@ -18,19 +20,25 @@ public class RestInterface {
     /**
      * This method gives the log entries for all activities for a specific scenario instance.
      *
-     * @param scenarioInstanceID The id of the scenario instance.
+     * @param instanceID The id of the scenario instance.
      * @return a JSON-Object with the log entries.
      */
     @GET
-    @Path("scenario/{scenarioID}/instance/{InstanceID}/activities")
+    @Path("scenario/{scenarioID}/instance/{instanceID}/activities")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getActivityLog(
-            @PathParam("scenarioID") int scenarioID,
-            @PathParam("InstanceID") int instanceID,
-            @QueryParam("state") String state) {
+            @DefaultValue("0") @PathParam("scenarioID") int scenarioID,
+            @DefaultValue("0") @PathParam("instanceID") int instanceID,
+            @DefaultValue(" ") @QueryParam("state") String state) {
+        if (instanceID == 0 || scenarioID == 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity("{\"error\":\"The instance or scenario ID is incorrect\"}")
+                    .build();
+        }
+
         Map<Integer, Map<String, Object>> activityLog;
-        //TODO: check if instanceID exists
-        if(state == null) {
+        if (state == null) {
             state = "";
         }
         switch (state) {
@@ -58,15 +66,48 @@ public class RestInterface {
     @Path("scenario/{scenarioID}/instance/{scenarioInstanceID}/dataobjects")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDataObjectLog(
-            @PathParam("scenarioID") int scenarioID,
-            @PathParam("scenarioInstanceID") int scenarioInstanceID) {
+            @DefaultValue("0") @PathParam("scenarioID") int scenarioID,
+            @DefaultValue("0") @PathParam("scenarioInstanceID") int scenarioInstanceID) {
+        if (scenarioInstanceID == 0 || scenarioID == 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity("{\"error\":\"The instance or scenario ID is incorrect\"}")
+                    .build();
+        }
         Map<Integer, Map<String, Object>> dataObjectLog;
-        //TODO: check if instanceID exists
         dataObjectLog = historyService.getDataObjectLogEntriesForScenarioInstance(scenarioInstanceID);
         return Response
                 .ok()
                 .type(MediaType.APPLICATION_JSON)
                 .entity(new JSONObject(dataObjectLog).toString())
+                .build();
+    }
+
+    /**
+     * This method gives the log entries for all DataAttributeInstances for a specific scenario instance.
+     *
+     * @param scenarioInstanceID The id of the scenario instance.
+     * @return a JSON-Object with the log entries.
+     */
+    @GET
+    @Path("scenario/{scenarioID}/instance/{scenarioInstanceID}/attributes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDataAttributeLog(
+            @DefaultValue("0") @PathParam("scenarioID") int scenarioID,
+            @DefaultValue("0") @PathParam("scenarioInstanceID") int scenarioInstanceID) {
+        if (scenarioInstanceID == 0 || scenarioID == 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity("{\"error\":\"The instance or scenario ID is incorrect\"}")
+                    .build();
+        }
+
+        Map<Integer, Map<String, Object>> attributeLog;
+        attributeLog = historyService.getDataAttributeInstanceLogEntriesForScenarioInstance(scenarioInstanceID);
+        return Response
+                .ok()
+                .type(MediaType.APPLICATION_JSON)
+                .entity(new JSONObject(attributeLog).toString())
                 .build();
     }
 }

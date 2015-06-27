@@ -6,25 +6,6 @@ import de.uni_potsdam.hpi.bpt.bp2014.jhistory.Log;
 import java.util.LinkedList;
 import java.util.Map;
 
-/***********************************************************************************
- *
- *   _________ _______  _        _______ _________ _        _______
- *   \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- *      )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- *      |  |  | (__    |   \ | || |         | |   |   \ | || (__
- *      |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- *      |  |  | (      | | \   || | \_  )   | |   | | \   || (
- *   |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- *   (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- *
- *******************************************************************
- *
- *   Copyright © All Rights Reserved 2014 - 2015
- *
- *   Please be aware of the License. You may found it in the root directory.
- *
- ************************************************************************************/
-
 /**
  * Represents the activity instance of the database.
  * Methods are mostly used by the HistoryService so you can get all terminated activities or start new ones.
@@ -49,7 +30,6 @@ public class DbActivityInstance extends DbObject {
      * @param state This is the state in which an activity should be after executing setState.
      */
     public void setState(int id, String state) {
-        //TODO: history log
         Log log = new Log();
         log.newActivityInstanceState(id, state);
         String sql = "UPDATE activityinstance SET activity_state = '" + state + "' WHERE id = " + id;
@@ -65,7 +45,6 @@ public class DbActivityInstance extends DbObject {
      * @return an Integer which is -1 if something went wrong else it is the database ID of the newly created activity instance.
      */
     public int createNewActivityInstance(int controlNodeInstance_id, String ActivityType, String ActivityState) {
-        //TODO: history log
         String sql = "INSERT INTO activityinstance (id, type, role_id, activity_state, workitem_state) VALUES (" + controlNodeInstance_id + ", '" + ActivityType + "', 1,'" + ActivityState + "', 'init')";
         int id = this.executeInsertStatement(sql);
         Log log = new Log();
@@ -95,7 +74,7 @@ public class DbActivityInstance extends DbObject {
         return this.executeStatementReturnsListInt(sql, "controlnode_id");
     }
 
-    public boolean getAutomaticExecution(int id){
+    public boolean getAutomaticExecution(int id) {
         String sql = "SELECT automaticexecution FROM activityinstance WHERE id = " + id;
         return this.executeStatementReturnsBoolean(sql, "automaticexecution");
     }
@@ -161,8 +140,7 @@ public class DbActivityInstance extends DbObject {
     }
 
 
-
-    public boolean getCanTerminate(int id){
+    public boolean getCanTerminate(int id) {
         String sql = "SELECT canTerminate FROM activityinstance WHERE id = " + id;
         return this.executeStatementReturnsBoolean(sql, "canTerminate");
     }

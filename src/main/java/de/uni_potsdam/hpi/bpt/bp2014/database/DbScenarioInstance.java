@@ -6,27 +6,6 @@ import java.util.Map;
 
 
 /**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
-
-/**
  * This class administrates the scenario instances in the databases and provides check methods to make sure the database is correct.
  * Moreover it is possible to mark a scenario instance as terminated.
  */
@@ -69,7 +48,7 @@ public class DbScenarioInstance extends DbObject {
      * Creates a new scenario instance from a scenario.
      * The given name will be assigned.
      *
-     * @param id The id of the scenario.
+     * @param id   The id of the scenario.
      * @param name The name, which has to be assigned to the instance.
      * @return -1 if something went wrong else it returns the database ID of the newly created scenario instance.
      */
@@ -131,7 +110,6 @@ public class DbScenarioInstance extends DbObject {
      * @param terminated          This is the changed status of the scenario instance.
      */
     public void setTerminated(int scenarioInstance_id, boolean terminated) {
-        //TODO: history log
         int terminatedAsInt;
         if (terminated) {
             terminatedAsInt = 1;

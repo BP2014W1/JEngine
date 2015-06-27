@@ -1,25 +1,31 @@
 package de.uni_potsdam.hpi.bpt.bp2014.jcomparser.xml;
 
-
 import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
-import de.uni_potsdam.hpi.bpt.bp2014.jcomparser.xml.Node;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ *
+ */
 public class NodeTest {
     private Document document = new DocumentImpl(null);
     private Element dataNode;
     private Element activityGlobalNode;
     private Element activityLocalNode;
     private Element activitySendNode;
+    private Element serviceTask;
     private Element startEventNode;
     private Element endEventNode;
     private Element xorNode;
     private Element andNode;
 
+
+    /**
+     *
+     */
     @Before
     public void setUpDataObject() {
         dataNode = document.createElement("node");
@@ -30,6 +36,9 @@ public class NodeTest {
         dataNode.appendChild(createProperty("stereotype", ""));
     }
 
+    /**
+     *
+     */
     @Before
     public void setUpGlobalTask() {
         activityGlobalNode = document.createElement("node");
@@ -40,6 +49,9 @@ public class NodeTest {
         activityGlobalNode.appendChild(createProperty("stereotype", ""));
     }
 
+    /**
+     *
+     */
     @Before
     public void setUpLocalTask() {
         activityLocalNode = document.createElement("node");
@@ -49,6 +61,10 @@ public class NodeTest {
         activityLocalNode.appendChild(createProperty("#id", "368338489"));
         activityLocalNode.appendChild(createProperty("stereotype", ""));
     }
+
+    /**
+     *
+     */
     @Before
     public void setUpSendTask(){
         activitySendNode = document.createElement("node");
@@ -59,6 +75,22 @@ public class NodeTest {
         activitySendNode.appendChild(createProperty("stereotype", "SEND"));
     }
 
+    /**
+     *
+     */
+    @Before
+    public void setUpServiceTask(){
+        serviceTask = document.createElement("node");
+        serviceTask.appendChild(createProperty("text", "WebService ausfuehren"));
+        serviceTask.appendChild(createProperty("global", "0"));
+        serviceTask.appendChild(createProperty("#type", "net.frapu.code.visualization.bpmn.Task"));
+        serviceTask.appendChild(createProperty("#id", "368338489"));
+        serviceTask.appendChild(createProperty("stereotype", "SERVICE"));
+    }
+
+    /**
+     *
+     */
     @Before
     public void setUpStartEventNode() {
         startEventNode = document.createElement("node");
@@ -68,6 +100,9 @@ public class NodeTest {
         startEventNode.appendChild(createProperty("stereotype", ""));
     }
 
+    /**
+     *
+     */
     @Before
     public void setUpEndEventNode() {
         endEventNode = document.createElement("node");
@@ -77,6 +112,9 @@ public class NodeTest {
         endEventNode.appendChild(createProperty("stereotype", ""));
     }
 
+    /**
+     *
+     */
     @Before
     public void setUpXorNode() {
         xorNode = document.createElement("node");
@@ -86,6 +124,9 @@ public class NodeTest {
         xorNode.appendChild(createProperty("stereotype", ""));
     }
 
+    /**
+     *
+     */
     @Before
     public void setUpAndNode() {
         andNode = document.createElement("node");
@@ -95,6 +136,12 @@ public class NodeTest {
         andNode.appendChild(createProperty("stereotype", ""));
     }
 
+    /**
+     *
+     * @param name
+     * @param value
+     * @return
+     */
     private Element createProperty(String name, String value) {
         if (null == document) {
             return null;
@@ -105,6 +152,9 @@ public class NodeTest {
         return property;
     }
 
+    /**
+     *
+     */
     @Test
     public void testGlobalActivityDeserialization() {
         Node activity = new Node();
@@ -115,8 +165,12 @@ public class NodeTest {
         Assert.assertEquals("Global has not been set correctly", true, activity.isGlobal());
         Assert.assertTrue("The Node is a Task but isTask returns false", activity.isTask());
         Assert.assertFalse("The Node is a Task but isDataNode returns true", activity.isDataNode());
+        Assert.assertEquals("The stereotype is not set correctly", "", activity.getStereotype());
     }
 
+    /**
+     *
+     */
     @Test
     public void testLocalActivityDeserialization() {
         Node activity = new Node();
@@ -127,8 +181,12 @@ public class NodeTest {
         Assert.assertEquals("Global has not been set correctly", false, activity.isGlobal());
         Assert.assertTrue("The Node is a Task but isTask returns false", activity.isTask());
         Assert.assertFalse("The Node is a Task but isDataNode returns true", activity.isDataNode());
+        Assert.assertEquals("The stereotype is not set correctly", "", activity.getStereotype());
     }
 
+    /**
+     *
+     */
     @Test
     public void testSendActivityDeserialization() {
         Node activity = new Node();
@@ -139,9 +197,28 @@ public class NodeTest {
         Assert.assertEquals("Global has not been set correctly", false, activity.isGlobal());
         Assert.assertTrue("The Node is a Task but isTask returns false", activity.isTask());
         Assert.assertFalse("The Node is a Task but isDataNode returns true", activity.isDataNode());
-        Assert.assertEquals("The stereotype is not set or not equal 'SEND'", "SEND", activity.getStereotype());
+        Assert.assertEquals("The stereotype is not set correctly", "SEND", activity.getStereotype());
     }
 
+    /**
+     *
+     */
+    @Test
+    public void testServiceTaskDeserialization() {
+        Node activity = new Node();
+        activity.initializeInstanceFromXML(serviceTask);
+        Assert.assertEquals("Id has not been set correctly", 368338489L, activity.getId());
+        Assert.assertEquals("Text has not been set correctly", "WebService ausfuehren", activity.getText());
+        Assert.assertEquals("Type has not been set correctly", "net.frapu.code.visualization.bpmn.Task", activity.getType());
+        Assert.assertEquals("Global has not been set correctly", false, activity.isGlobal());
+        Assert.assertTrue("The Node is a Task but isTask returns false", activity.isTask());
+        Assert.assertFalse("The Node is a Task but isDataNode returns true", activity.isDataNode());
+        Assert.assertEquals("The stereotype is not set correctly", "SERVICE", activity.getStereotype());
+    }
+
+    /**
+     *
+     */
     @Test
     public void testStartEventyDeserialization() {
         Node startEvent = new Node();
@@ -151,8 +228,12 @@ public class NodeTest {
         Assert.assertEquals("Type has not been set correctly", "net.frapu.code.visualization.bpmn.StartEvent", startEvent.getType());
         Assert.assertFalse("The Node is a StartEvent but isTask returns true", startEvent.isTask());
         Assert.assertFalse("The Node is a StartEvent but isDataNode returns true", startEvent.isDataNode());
+        Assert.assertEquals("The stereotype is not set correctly", "", startEvent.getStereotype());
     }
 
+    /**
+     *
+     */
     @Test
     public void testEndEventDeserialization() {
         Node endEvent = new Node();
@@ -162,8 +243,12 @@ public class NodeTest {
         Assert.assertEquals("Type has not been set correctly", "net.frapu.code.visualization.bpmn.EndEvent", endEvent.getType());
         Assert.assertFalse("The Node is a endEvent but isTask returns true", endEvent.isTask());
         Assert.assertFalse("The Node is a endEvent but isDataNode returns true", endEvent.isDataNode());
+        Assert.assertEquals("The stereotype is not set correctly", "", endEvent.getStereotype());
     }
 
+    /**
+     *
+     */
     @Test
     public void testXorDeserialization() {
         Node xor = new Node();
@@ -173,8 +258,12 @@ public class NodeTest {
         Assert.assertEquals("Type has not been set correctly", "net.frapu.code.visualization.bpmn.ExclusiveGateway", xor.getType());
         Assert.assertFalse("The Node is a xorGateway but isTask returns true", xor.isTask());
         Assert.assertFalse("The Node is a xorGateway but isDataNode returns true", xor.isDataNode());
+        Assert.assertEquals("The stereotype is not set correctly", "", xor.getStereotype());
     }
 
+    /**
+     *
+     */
     @Test
     public void testAndDeserialization() {
         Node and = new Node();
@@ -184,8 +273,12 @@ public class NodeTest {
         Assert.assertEquals("Type has not been set correctly", "net.frapu.code.visualization.bpmn.ParallelGateway", and.getType());
         Assert.assertFalse("The Node is a andGateway but isTask returns true", and.isTask());
         Assert.assertFalse("The Node is a andGateway but isDataNode returns true", and.isDataNode());
+        Assert.assertEquals("The stereotype is not set correctly", "", and.getStereotype());
     }
 
+    /**
+     *
+     */
     @Test
     public void testDataObject() {
         Node data = new Node();
@@ -195,6 +288,7 @@ public class NodeTest {
         Assert.assertEquals("Type has not been set correctly", "net.frapu.code.visualization.bpmn.DataObject", data.getType());
         Assert.assertFalse("The Node is a dataObject, but isTask returns true", data.isTask());
         Assert.assertTrue("The Node is a dataobject, but isDataNode returns false", data.isDataNode());
+        Assert.assertEquals("The stereotype is not set correctly", "", data.getStereotype());
     }
 
     /**

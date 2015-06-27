@@ -19,9 +19,6 @@ import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by Ihdefix on 04.03.2015.
- */
 public class DataClass implements IDeserialisable, IPersistable {
     /**
      * This is the modelID of the dataClass.
@@ -39,7 +36,7 @@ public class DataClass implements IDeserialisable, IPersistable {
      * This boolean is used to identify the root element
      * of the domainModel which is used to get the caseDataObject.
      */
-    private boolean rootNode = false;
+    private boolean isRootNode = false;
     /**
      * This is a list containing all dataAttributes belonging to this dataClass.
      */
@@ -48,6 +45,7 @@ public class DataClass implements IDeserialisable, IPersistable {
      * This contains the XML representation of the dataClass.
      */
     private org.w3c.dom.Node dataClassXML;
+
     /**
      * Sets the processeditorServerUrl which is needed for connecting to the server
      * in order to get the XML-files for the fragments.
@@ -71,8 +69,8 @@ public class DataClass implements IDeserialisable, IPersistable {
     public void initializeInstanceFromXML(final org.w3c.dom.Node element) {
         this.dataClassXML = element;
         NodeList properties = element.getChildNodes();
-        for(int i = 0; i < properties.getLength(); i++){
-            if(properties.item(i).getNodeName().equals("property")){
+        for (int i = 0; i < properties.getLength(); i++) {
+            if (properties.item(i).getNodeName().equals("property")) {
                 org.w3c.dom.Node property = properties.item(i);
                 initializeField(property);
             }
@@ -102,7 +100,7 @@ public class DataClass implements IDeserialisable, IPersistable {
                 dataClassModelID = Long.parseLong(value);
                 break;
             case "stereotype":
-                rootNode = value.equals("root_instance");
+                isRootNode = value.equals("root_instance");
                 break;
             default:
                 // Property will not be handled
@@ -118,7 +116,7 @@ public class DataClass implements IDeserialisable, IPersistable {
     @Override
     public int save() {
         Connector conn = new Connector();
-        int root = this.rootNode?1:0;
+        int root = this.isRootNode ? 1 : 0;
         this.dataClassID = conn.insertDataClassIntoDatabase(
                 this.dataClassName,
                 root);
@@ -135,8 +133,8 @@ public class DataClass implements IDeserialisable, IPersistable {
      */
     private void generateDataAttributeList(String value) {
         String[] attributes = value.split(" ;");
-        for(String attribute : attributes){
-            if(!attribute.isEmpty()){
+        for (String attribute : attributes) {
+            if (!attribute.isEmpty()) {
                 /*
                     DataAttributes are saved in the following form:
                     "{[number]}+[nameOfTheAttribute]".
@@ -171,7 +169,9 @@ public class DataClass implements IDeserialisable, IPersistable {
         return dataAttributes;
     }
 
-    public boolean isRootNode(){ return rootNode;}
+    public boolean isRootNode() {
+        return isRootNode;
+    }
 
     public Node getDataClassXML() {
         return dataClassXML;

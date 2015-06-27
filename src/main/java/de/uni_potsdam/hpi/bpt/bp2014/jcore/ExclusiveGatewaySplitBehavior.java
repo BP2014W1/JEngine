@@ -4,39 +4,20 @@ package de.uni_potsdam.hpi.bpt.bp2014.jcore;
 import de.uni_potsdam.hpi.bpt.bp2014.database.DbState;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
+import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
-
 
 public class ExclusiveGatewaySplitBehavior extends ParallelOutgoingBehavior {
+    static Logger log = Logger.getLogger(ExclusiveGatewaySplitBehavior.class.getName());
     /**
      * List of IDs of following control nodes.
      */
-    private LinkedList<LinkedList<Integer>> followingControlNodes = new LinkedList<LinkedList<Integer>>();
+    private LinkedList<LinkedList<Integer>> followingControlNodes = new LinkedList<>();
 
     private DbState dbState = new DbState();
 
@@ -100,31 +81,27 @@ public class ExclusiveGatewaySplitBehavior extends ParallelOutgoingBehavior {
     @Override
     protected ControlNodeInstance createFollowingNodeInstance(int controlNode_id) {
         for (ControlNodeInstance controlNodeInstance : scenarioInstance.getControlNodeInstances()) {
-            if (controlNode_id == controlNodeInstance.controlNode_id) {
+            if (controlNode_id == controlNodeInstance.controlNode_id && !controlNodeInstance.getClass().equals(ActivityInstance.class) && !controlNodeInstance.getStateMachine().state.equals("terminated")) {
                 return controlNodeInstance;
             }
         }
         String type = dbControlNode.getType(controlNode_id);
-        ControlNodeInstance controlNodeInstance = null;
-        //TODO type
+        ControlNodeInstance controlNodeInstance = createControlNode(type, controlNode_id);
+        setAutomaticExecutionToFalse(type, controlNodeInstance);
+        return controlNodeInstance;
+    }
+
+    private void setAutomaticExecutionToFalse(String type, ControlNodeInstance controlNodeInstance) {
         switch (type) {
             case "Activity":
             case "EmailTask":
-                controlNodeInstance = new ActivityInstance(controlNode_id, fragmentInstance_id, scenarioInstance);
+            case "WebServiceTask":
                 ((ActivityInstance) controlNodeInstance).setAutomaticExecution(false);
                 break;
-            case "Endevent":
-                controlNodeInstance = new EventInstance(fragmentInstance_id, scenarioInstance, "Endevent");
-                break;
-            case "XOR":
-                controlNodeInstance = new GatewayInstance(controlNode_id, fragmentInstance_id, scenarioInstance);
-                break;
             case "AND":
-                controlNodeInstance = new GatewayInstance(controlNode_id, fragmentInstance_id, scenarioInstance);
                 ((GatewayInstance) controlNodeInstance).setAutomaticExecution(false);
                 break;
         }
-        return controlNodeInstance;
     }
 
     /**
@@ -164,43 +141,40 @@ public class ExclusiveGatewaySplitBehavior extends ParallelOutgoingBehavior {
         int defaultControlNode = -1;
         while (key.hasNext()) {
             controlNode_id = (Integer) key.next();
-            if((conditions.get(controlNode_id)).equals("DEFAULT")){
+            if ((conditions.get(controlNode_id)).equals("DEFAULT")) {
                 defaultControlNode = controlNode_id;
             } else if (evaluateCondition(conditions.get(controlNode_id))) {
                 defaultExecution = false;
                 break;
             }
         }
-        if(defaultExecution){
-            if(defaultControlNode != -1) {
+        if (defaultExecution) {
+            if (defaultControlNode != -1) {
                 ControlNodeInstance controlNodeInstance = super.createFollowingNodeInstance(defaultControlNode);
-                controlNodeInstance.getIncomingBehavior().enableControlFlow();
+                controlNodeInstance.enableControlFlow();
             }
         } else {
             ControlNodeInstance controlNodeInstance = super.createFollowingNodeInstance(controlNode_id);
-            controlNodeInstance.getIncomingBehavior().enableControlFlow();
+            controlNodeInstance.enableControlFlow();
         }
 
     }
 
     /**
      * Evaluates one specific condition.
+     *
      * @param condition The condition as String.
      * @return true if the condition ist true.
      */
     public boolean evaluateCondition(String condition) {
         XORGrammarCompiler compiler = new XORGrammarCompiler();
         CommonTree ast = compiler.compile(condition);
-        if (ast.getChildCount() > 0) {
-            return evaluate(0, ast);
-        }
-        return false;
+        return ast.getChildCount() > 0 && evaluate(0, ast);
     }
 
 
     private boolean evaluate(int i, Tree ast) {
-        boolean condition = false;
-        condition = checkCondition(ast, i);
+        boolean condition = checkCondition(ast, i);
         if (ast.getChildCount() >= i + 4) {
             if (ast.getChild(i + 3).toStringTree().equals("&") || ast.getChild(i + 3).toStringTree().equals(" & ")) {
                 return (condition & evaluate(i + 4, ast));
@@ -212,36 +186,57 @@ public class ExclusiveGatewaySplitBehavior extends ParallelOutgoingBehavior {
         }
     }
 
+    /**
+     * @param ast
+     * @param i
+     * @return
+     */
     private boolean checkCondition(Tree ast, int i) {
         String left = ast.getChild(i).toStringTree();
         String comparison = ast.getChild(i + 1).toStringTree();
         String right = ast.getChild(i + 2).toStringTree();
         for (DataAttributeInstance dataAttributeInstance : scenarioInstance.getDataAttributeInstances().values()) {
             left = left.replace(
-                    "$" + (dataAttributeInstance.getDataObjectInstance()).getName()
+                    "#" + (dataAttributeInstance.getDataObjectInstance()).getName()
                             + "." + dataAttributeInstance.getName(), dataAttributeInstance.getValue().toString());
             right = right.replace(
-                    "$" + (dataAttributeInstance.getDataObjectInstance()).getName()
+                    "#" + (dataAttributeInstance.getDataObjectInstance()).getName()
                             + "." + dataAttributeInstance.getName(), dataAttributeInstance.getValue().toString());
         }
         for (DataObjectInstance dataObjectInstance : scenarioInstance.getDataObjectInstances()) {
             left = left.replace(
-                    "$" + dataObjectInstance.getName(), dbState.getStateName(dataObjectInstance.getState_id()));
+                    "#" + dataObjectInstance.getName(), dbState.getStateName(dataObjectInstance.getState_id()));
             right = right.replace(
-                    "$" + dataObjectInstance.getName(), dbState.getStateName(dataObjectInstance.getState_id()));
+                    "#" + dataObjectInstance.getName(), dbState.getStateName(dataObjectInstance.getState_id()));
         }
-        switch (comparison) {
-            case "=":
-                return left.equals(right);
-            case "<":
-                return Float.parseFloat(left) < Float.parseFloat(right);
-            case "<=":
-                return Float.parseFloat(left) <= Float.parseFloat(right);
-            case ">":
-                return Float.parseFloat(left) > Float.parseFloat(right);
-            case ">=":
-                return Float.parseFloat(left) >= Float.parseFloat(right);
+        try {
+            switch (comparison) {
+                case "=":
+                    return left.equals(right);
+                case "<":
+                    return Float.parseFloat(left) < Float.parseFloat(right);
+                case "<=":
+                    return Float.parseFloat(left) <= Float.parseFloat(right);
+                case ">":
+                    return Float.parseFloat(left) > Float.parseFloat(right);
+                case ">=":
+                    return Float.parseFloat(left) >= Float.parseFloat(right);
+                case "!=":
+                    return !left.equals(right);
+                case "!<":
+                    return !(Float.parseFloat(left) < Float.parseFloat(right));
+                case "!<=":
+                    return !(Float.parseFloat(left) <= Float.parseFloat(right));
+                case "!>":
+                    return !(Float.parseFloat(left) > Float.parseFloat(right));
+                case "!>=":
+                    return !(Float.parseFloat(left) >= Float.parseFloat(right));
 
+            }
+        } catch (NumberFormatException e) {
+            log.error("Error can't convert String to Float:", e);
+        } catch (NullPointerException e) {
+            log.error("Error can't convert String to Float, String is null:", e);
         }
         return false;
     }

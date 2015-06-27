@@ -10,8 +10,12 @@ import org.w3c.dom.Element;
 import java.util.HashMap;
 import java.util.Map;
 
+
+
 /**
- * Created by Ihdefix on 12.03.2015.
+ * These tests assure that the deserialization of an aggregation and its dataClasses works correctly.
+ * Therefore, two dataClasses (one of them is a root node) which are connected by an aggregation are generated
+ * and deserialized.
  */
 public class AggregationTest {
     private Document document = new DocumentImpl(null);
@@ -20,6 +24,10 @@ public class AggregationTest {
     private Element sourceDataClass;
     private Element targetDataClass;
 
+    /**
+     * Set up an aggregation represented as a Node by appending Elements that correspond to the structure of the XML
+     * the ProcessEditor generates.
+     */
     @Before
     public void setupAggregation(){
         aggregation = document.createElement("edge");
@@ -28,9 +36,11 @@ public class AggregationTest {
         aggregation.appendChild(createProperty("#type","net.frapu.code.visualization.domainModel.Aggregation"));
         aggregation.appendChild(createProperty("#sourceNode","801101005"));
         aggregation.appendChild(createProperty("#targetNode","679826034"));
-
     }
-
+    /**
+     * Set up a dataClass represented as a Node by appending Elements that correspond to the structure of the XML
+     * the ProcessEditor generates (including attributes etc.). This dataClass is the rootnode of the domainmodel.
+     */
     @Before
     public void setupSourceDataClass(){
         sourceDataClass = document.createElement("node");
@@ -41,7 +51,10 @@ public class AggregationTest {
         sourceDataClass.appendChild(createProperty("stereotype", "root_instance"));
         addToDataClasses(sourceDataClass);
     }
-
+    /**
+     * Set up a dataClass represented as a Node by appending Elements that correspond to the structure of the XML
+     * the ProcessEditor generates (including attributes etc.). This dataClass is the second participant of the aggregation.
+     */
     @Before
     public void setupTargetDataClass(){
         targetDataClass = document.createElement("node");
@@ -53,12 +66,22 @@ public class AggregationTest {
         addToDataClasses(targetDataClass);
     }
 
+    /**
+     * Initialize a DataClass with help of the XML-representation and adding it to the list of DataClasses of this test.
+     * @param dataClass XML-node of the dataClass (according to the structure of the one the ProcessEditor generates)
+     */
     private void addToDataClasses(Element dataClass){
         DataClass dClass = new DataClass();
         dClass.initializeInstanceFromXML(dataClass);
         dataClasses.put(dClass.getDataClassModelID(), dClass);
     }
 
+    /**
+     * Creates an element that might be appended to the Node
+     * @param name Name of the property
+     * @param value Value the property holds
+     * @return An element with the attribute specified by the parameters
+     */
     private Element createProperty(String name, String value) {
         if (null == document) {
             return null;
@@ -68,21 +91,27 @@ public class AggregationTest {
         property.setAttribute("value", value);
         return property;
     }
-
+    /**
+     * Test deserialization of the root node dataClass is correct.
+     */
     @Test
     public void testSourceDataClass(){
         Assert.assertNotNull("ID has not been set correctly", dataClasses.get(801101005L));
         Assert.assertEquals("Name has not been set correctly", "Reise", dataClasses.get(801101005L).getDataClassName());
         Assert.assertEquals("Attributes have not been set correctly", 3, dataClasses.get(801101005L).getDataAttributes().size());
     }
-
+    /**
+     * Test deserialization of the dataClass that is aggregated is correct
+     */
     @Test
     public void testTargetDataClass(){
         Assert.assertNotNull("ID has not been set correctly", dataClasses.get(679826034L));
         Assert.assertEquals("Name has not been set correctly", "Flug", dataClasses.get(679826034L).getDataClassName());
         Assert.assertEquals("Attributes have not been set correctly", 4, dataClasses.get(679826034L).getDataAttributes().size());
     }
-
+    /**
+     * Test deserialization of the aggregation is correct.
+     */
     @Test
     public void testAggregation(){
         Aggregation aggregate = new Aggregation();
@@ -93,6 +122,5 @@ public class AggregationTest {
         Assert.assertEquals("SourceId has not been set correctly", 801101005L, aggregate.getSource().getDataClassModelID());
         Assert.assertEquals("TargetName has not been set correctly", "Flug", aggregate.getTarget().getDataClassName());
         Assert.assertEquals("TargetId has not been set correctly", 679826034L, aggregate.getTarget().getDataClassModelID());
-
     }
 }

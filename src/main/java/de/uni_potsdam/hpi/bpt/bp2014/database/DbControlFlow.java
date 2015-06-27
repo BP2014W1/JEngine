@@ -3,25 +3,6 @@ package de.uni_potsdam.hpi.bpt.bp2014.database;
 import java.util.LinkedList;
 import java.util.Map;
 
-/***********************************************************************************
- *
- *   _________ _______  _        _______ _________ _        _______
- *   \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- *      )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- *      |  |  | (__    |   \ | || |         | |   |   \ | || (__
- *      |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- *      |  |  | (      | | \   || | \_  )   | |   | | \   || (
- *   |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- *   (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- *
- *******************************************************************
- *
- *   Copyright © All Rights Reserved 2014 - 2015
- *
- *   Please be aware of the License. You may found it in the root directory.
- *
- ************************************************************************************/
-
 /**
  * Represents the ControlFlow in the database.
  * Mostly used to get predecessors and successors of a controlNode.
@@ -67,7 +48,7 @@ public class DbControlFlow extends DbObject {
      * @param controlNode_id This is the database ID of a controlNode.
      * @return a map of database ID's of controlNodes and conditions which precede the given controlNode.
      */
-    public Map<Integer, String> getConditions(int controlNode_id){
+    public Map<Integer, String> getConditions(int controlNode_id) {
         String sql = "SELECT controlnode_id2, controlflow.condition FROM controlflow WHERE controlnode_id1 = " + controlNode_id;
         return this.executeStatementReturnsMap(sql, "controlnode_id2", "condition");
     }

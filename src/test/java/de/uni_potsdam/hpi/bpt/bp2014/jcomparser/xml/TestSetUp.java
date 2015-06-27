@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+
+
+
 /**
  * This class provides methods for both creating scenarios by mocking necessary components and for setting the database
  * to an appropriate state after executing the tests.
@@ -52,7 +55,7 @@ public class TestSetUp {
     /**
      * The sql-file for setting up the database.
      */
-    private static final String DEVELOPMENT_SQL_SEED_FILE = "src/main/resources/JEngineV2.sql";
+    private static final String DEVELOPMENT_SQL_SEED_FILE = "src/main/resources/JEngineV2_schema.sql";
 
     /**
      * Initialize a fragment by configuring the mock.

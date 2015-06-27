@@ -3,6 +3,7 @@ package de.uni_potsdam.hpi.bpt.bp2014.jcomparser;
 import com.google.gson.Gson;
 import de.uni_potsdam.hpi.bpt.bp2014.settings.Settings;
 import de.uni_potsdam.hpi.bpt.bp2014.util.JsonUtil;
+import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import javax.ws.rs.*;
@@ -13,36 +14,17 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.util.HashMap;
 
-/**
- * ********************************************************************************
- *
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- *
- * ******************************************************************
- *
- * Copyright © All Rights Reserved 2014 - 2015
- *
- * Please be aware of the License. You may found it in the root directory.
- *
- * **********************************************************************************
- */
-
 
 /**
  * As a part of the JComparser we need to provide a REST API.
  * The REST API provides an Interface to to manage changes
  * or updates in the JEngine Database.
+ *
  */
 
 @Path("jcomparser")
 public class REST {
+    static Logger log = Logger.getLogger(REST.class.getName());
     /**
      * The URL to the ProcessEditor Model repository.
      */
@@ -67,11 +49,9 @@ public class REST {
             throws IOException, SAXException, ParserConfigurationException {
         JComparser comparser = new JComparser();
         String scenarioURL = PCM_URL + scenarioID + ".pm";
-        //TODO: create a db record with the status of the import & return its value with REST call link for further informations
         return comparser.fetchAndParseScenarioFromServer(scenarioURL, PROCESS_SERVER_URI);
     }
 
-    //TODO: implement GET call to get status of scenario import
 
     /**
      * Fetches a List of all Scenarios and their IDs from the PE-Server.
@@ -88,7 +68,7 @@ public class REST {
         try {
             scenarioIDs = comparser.getScenarioNamesAndIDs(PROCESS_SERVER_URI);
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
 
         if (scenarioIDs.size() == 0) {

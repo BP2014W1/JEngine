@@ -1,32 +1,13 @@
 package de.uni_potsdam.hpi.bpt.bp2014.database;
 
+import org.apache.log4j.Logger;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.*;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
-/**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
 
 /**
  * This class is used to build a connection to the database.
@@ -39,6 +20,7 @@ public class Connection {
     private static String password;
     private static String url;
     private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    static Logger log = Logger.getLogger(Connection.class.getName());
 
     /**
      * constructor
@@ -88,7 +70,7 @@ public class Connection {
             conn = DriverManager.getConnection(url, username, password);
         } catch (Exception e) {
             //Handle errors for Class.forName
-            e.printStackTrace();
+            log.error("MySQL Connection Error:", e);
         }
         return conn;
     }
@@ -113,10 +95,10 @@ public class Connection {
                 password = (String) ctx.lookup("java:comp/env/password");
                 url = (String) ctx.lookup("java:comp/env/url");
             } catch (NamingException e1) {
-                e1.printStackTrace();
+                log.error("MySQL Connection Error:", e1);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("MySQL Connection Error:", e);
         }
     }
 }

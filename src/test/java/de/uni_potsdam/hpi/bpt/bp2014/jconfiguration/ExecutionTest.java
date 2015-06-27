@@ -1,7 +1,7 @@
 package de.uni_potsdam.hpi.bpt.bp2014.jconfiguration;
 
-
 import com.ibatis.common.jdbc.ScriptRunner;
+import de.uni_potsdam.hpi.bpt.bp2014.AbstractTest;
 import de.uni_potsdam.hpi.bpt.bp2014.database.Connection;
 import de.uni_potsdam.hpi.bpt.bp2014.database.DbObject;
 import org.junit.AfterClass;
@@ -15,8 +15,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+
 public class ExecutionTest {
-    private static final String DEVELOPMENT_SQL_SEED_FILE = "src/main/resources/JEngineV2.sql";
+    private static final String DEVELOPMENT_SQL_SEED_FILE = "src/test/resources/JEngineV2_AcceptanceTests.sql";
     @Test
     public void testDeletion() throws IOException, SQLException, Exception{
         String insertScenarios = "INSERT INTO `scenario` (`id`, `name`, `deleted`, `modelid`, `modelversion`, `datamodelid`, `datamodelversion`) VALUES " +

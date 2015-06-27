@@ -2,6 +2,7 @@ package de.uni_potsdam.hpi.bpt.bp2014.jcomparser.xml;
 
 import de.uni_potsdam.hpi.bpt.bp2014.jcomparser.Connector;
 import de.uni_potsdam.hpi.bpt.bp2014.jcomparser.Retrieval;
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -24,7 +25,7 @@ import java.util.*;
  * It can be parsed from an XML and written to a Database.
  */
 public class Scenario implements IDeserialisable, IPersistable {
-
+    static Logger log = Logger.getLogger(Scenario.class.getName());
     /**
      * The Name of the Scenario.
      */
@@ -54,15 +55,6 @@ public class Scenario implements IDeserialisable, IPersistable {
      * A Map of the names of dataObjects and the objects themselves.
      */
     private Map<String, DataObject> dataObjects;
-    /**
-     * The DataNode which is part of the termination Condition.
-     */
-    private Node terminatingDataNode;
-    /**
-     * terminatingDataObject is a dataObject.
-     * It is part of the termination condition.
-     */
-    private DataObject terminatingDataObject;
     /**
      * The version of the current Scenario.
      */
@@ -94,12 +86,16 @@ public class Scenario implements IDeserialisable, IPersistable {
     private Element domainModelXML;
     /**
      * This is the domainModel Object belonging to this scenario.
-      */
+     */
     private DomainModel domainModel;
     /**
      * If migration is necessary, this variable contains all the fragments that are new and not in the older version.
      */
     private List<Fragment> newFragments;
+    /**
+     * List<TCSets<Do, state>>
+     */
+    private List<Map<DataObject, String>> terminationCondition;
 
     /**
      * Creates a new Scenario Object and saves the PE-ServerURL.
@@ -133,7 +129,6 @@ public class Scenario implements IDeserialisable, IPersistable {
         setTerminationCondition();
         setVersionNumber();
         checkIfVersionAlreadyInDatabase();
-
     }
 
     /**
@@ -150,7 +145,7 @@ public class Scenario implements IDeserialisable, IPersistable {
      * @return the domainModel or null if there was no XML given.
      */
     private DomainModel createAndInitializeDomainModel() {
-        if(domainModelXML != null){
+        if (domainModelXML != null) {
             domainModel = new DomainModel(processeditorServerUrl);
             domainModel.initializeInstanceFromXML(domainModelXML);
             return domainModel;
@@ -166,7 +161,7 @@ public class Scenario implements IDeserialisable, IPersistable {
     private Element fetchDomainModelXML() {
         try {
             Retrieval jRetrieval = new Retrieval();
-            String versionXML = jRetrieval.getHTMLwithAuth(
+            String versionXML = jRetrieval.getXMLWithAuth(
                     processeditorServerUrl,
                     processeditorServerUrl + "models/" + domainModelURI + ".pm");
             InputSource is = new InputSource();
@@ -177,7 +172,7 @@ public class Scenario implements IDeserialisable, IPersistable {
             Document doc = db.parse(is);
             return doc.getDocumentElement();
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
         return null;
     }
@@ -193,10 +188,10 @@ public class Scenario implements IDeserialisable, IPersistable {
         try {
             domainModelURI = xPath.compile(xPathQuery).evaluate(this.scenarioXML);
             //This is used to make sure we only get the domainModelModelID
-            domainModelURI = domainModelURI.split("\\/")[domainModelURI.split("\\/").length-1];
+            domainModelURI = domainModelURI.split("\\/")[domainModelURI.split("\\/").length - 1];
             domainModelURI = domainModelURI.split("\\.")[0];
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
     }
 
@@ -264,14 +259,14 @@ public class Scenario implements IDeserialisable, IPersistable {
         }
         checkDomainModelVersion(oldScenarioDbID);
         // in case old scenario is deleted...
-        if(!needsToBeSaved) {
+        if (!needsToBeSaved) {
             int oldScenarioDeleted = connector.isScenarioDeleted(oldScenarioDbID);
             if (oldScenarioDeleted == 1) {
                 needsToBeSaved = true;
             }
         }
-
     }
+
     /**
      * Checks the version of the domainModel in the database and compares it with the version of this scenario.
      * If the version in the database older as this one, migration won't be initiated.
@@ -285,8 +280,7 @@ public class Scenario implements IDeserialisable, IPersistable {
         if (domainModel.getVersionNumber() > oldDataModelVersion) {
             migrationNecessary = false;
             needsToBeSaved = true;
-        }
-        else {
+        } else {
             // case 2: There is another domainModel now
             long oldDataModelID = connector.getDataModelID(oldScenarioDbID);
             if (oldDataModelID != domainModel.getDomainModelModelID()) {
@@ -323,7 +317,7 @@ public class Scenario implements IDeserialisable, IPersistable {
                 }
                 versionNumber = maxID;
             } catch (XPathExpressionException e) {
-                e.printStackTrace();
+                log.error("Error:", e);
             }
         }
     }
@@ -338,7 +332,7 @@ public class Scenario implements IDeserialisable, IPersistable {
     private Element fetchVersionXML() {
         try {
             Retrieval jRetrieval = new Retrieval();
-            String versionXML = jRetrieval.getHTMLwithAuth(
+            String versionXML = jRetrieval.getXMLWithAuth(
                     processeditorServerUrl,
                     processeditorServerUrl + "models/" +
                             scenarioID + "/versions");
@@ -350,7 +344,7 @@ public class Scenario implements IDeserialisable, IPersistable {
             Document doc = db.parse(is);
             return doc.getDocumentElement();
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
         return null;
     }
@@ -360,61 +354,36 @@ public class Scenario implements IDeserialisable, IPersistable {
      * Corresponding values will be saved to the corresponding fields.
      */
     private void setTerminationCondition() {
-        String objectName = getTerminatingObjectName();
-        String objectState = getTerminatingObjectState();
-        if (objectName.equals("") || objectState.equals("[]")) {
+        terminationCondition = new LinkedList<>();
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        String xPathQuery = "/model/properties/property" +
+                "[@name='Termination condition']/@value";
+        String tcs = "";
+        try {
+            tcs = xPath.compile(xPathQuery).evaluate(this.scenarioXML);
+        } catch (XPathExpressionException e) {
+            log.error("Error:", e);
+        }
+        if (tcs.isEmpty()) {
+            terminationCondition = null;
             return;
         }
-
-        for (Map.Entry<String, DataObject> dataObject
-                : dataObjects.entrySet()) {
-            if (dataObject.getKey().equals(objectName)) {
-                for (Node dataNode : dataObject.getValue().getDataNodes()) {
-                    // TODO: state in terminationCondition in Scenario-XML and in Node of Fragment-XML should not differ in the usage of "[]"
-                    if (objectState.equals("[" + dataNode.getState() + "]")) {
-                        terminatingDataNode = dataNode;
-                    }
+        tcs = tcs.replaceAll("; ", ";");
+        String[] terminationConditions = tcs.split(";");
+        for (String set : terminationConditions) {
+            if (set.isEmpty())
+                continue;
+            Map<DataObject, String> setMap = new HashMap<>();
+            for (String setEntry : set.split(",")) {
+                String dataObject = setEntry.replaceAll("\\[[a-zA-Z0-9_.]+\\]", "");
+                String state = setEntry.replaceAll("[a-zA-Z0-9_.]+\\[", "").replaceAll("\\]", "");
+                if (dataObject != "" && state != "") {
+                    setMap.put(dataObjects.get(dataObject), state);
                 }
-                terminatingDataObject = dataObject.getValue();
             }
+            if (setMap.size() > 0)
+                terminationCondition.add(setMap);
         }
-    }
-
-    /**
-     * Gets the state which is part of the termination Condition from the xml.
-     *
-     * @return returns the state if possible else null.
-     */
-    private String getTerminatingObjectState() {
-        XPath xPath = XPathFactory.newInstance().newXPath();
-        String xPathQuery = "/model/properties/property" +
-                "[@name='Termination State']/@value";
-        try {
-            return xPath.compile(xPathQuery).evaluate(this.scenarioXML);
-        } catch (XPathExpressionException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * Extracts the data name of the DataObject from the termination condition.
-     * It plays a role in the termination Condition from the xml.
-     *
-     * @return null if extraction failed, else the name.
-     */
-    private String getTerminatingObjectName() {
-        XPath xPath = XPathFactory.newInstance().newXPath();
-        String xPathQuery = "/model/properties/property" +
-                "[@name = 'Termination Data Object']/@value";
-        try {
-            return xPath
-                    .compile(xPathQuery)
-                    .evaluate(this.scenarioXML);
-        } catch (XPathExpressionException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     /**
@@ -428,7 +397,7 @@ public class Scenario implements IDeserialisable, IPersistable {
                     .compile(xPathQuery)
                     .evaluate(this.scenarioXML));
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
     }
 
@@ -445,7 +414,7 @@ public class Scenario implements IDeserialisable, IPersistable {
             domainModel.save();
             saveDataObjects();
             saveConsistsOf();
-            if (terminatingDataObject != null && terminatingDataNode != null) {
+            if (terminationCondition != null && terminationCondition.size() > 0) {
                 saveTerminationCondition();
             }
             saveReferences();
@@ -476,6 +445,7 @@ public class Scenario implements IDeserialisable, IPersistable {
         migrateDataObjects();
         //domainModel.migrate(migratingScenarioDbID);
     }
+
     /**
      * Migrate all dataObjectInstances of all scenarioInstances that are migrated.
      */
@@ -552,11 +522,15 @@ public class Scenario implements IDeserialisable, IPersistable {
         Connector conn = new Connector();
         // first parameter currently irrelevant,
         // due to the restriction of the terminationCondition
-        conn.insertTerminationConditionIntoDatabase(1,
-                terminatingDataObject.getDatabaseId(),
-                terminatingDataObject.getStates().get(
-                        terminatingDataNode.getState()),
-                databaseID);
+        for (int i = 0; i < terminationCondition.size(); i++) {
+            for (Map.Entry<DataObject, String> entry : terminationCondition.get(i).entrySet()) {
+                int stateID = entry.getKey().getStates().get(entry.getValue());
+                conn.insertTerminationConditionIntoDatabase(i + 1,
+                        entry.getKey().getDatabaseId(),
+                        stateID,
+                        databaseID);
+            }
+        }
     }
 
     /**
@@ -578,7 +552,6 @@ public class Scenario implements IDeserialisable, IPersistable {
      */
     private void saveDataObjects() {
         for (DataObject dataObject : dataObjects.values()) {
-            dataObject.setDataClass(domainModel.getDataClasses());
             dataObject.setScenarioId(databaseID);
             dataObject.save();
         }
@@ -591,40 +564,22 @@ public class Scenario implements IDeserialisable, IPersistable {
      */
     private void saveConsistsOf() {
         for (Fragment frag : fragments) {
-            saveInputSetsConsistOf(frag);
-            saveOutputSetsConsistOf(frag);
+            saveDataSetConsistOf(frag);
         }
     }
 
     /**
-     * Saves the relation of a output set to data nodes.
+     * Saves the relation of a dataSet to its dataNodes.
      * Only the nodes of one Fragment will be represented.
      *
-     * @param frag The fragment which contains the Output set
+     * @param frag The fragment which contains the DataSet
      */
-    private void saveOutputSetsConsistOf(final Fragment frag) {
+    private void saveDataSetConsistOf(final Fragment frag) {
         Connector connector = new Connector();
-        for (OutputSet oSet : frag.getOutputSets()) {
-            for (Node dataNode : oSet.getDataObjects()) {
+        for (Set set : frag.getSets()) {
+            for (Node dataNode : set.getDataNodes()) {
                 connector.insertDataSetConsistOfDataNodeIntoDatabase(
-                        oSet.getDatabaseId(),
-                        dataNode.getDatabaseID());
-            }
-        }
-    }
-
-    /**
-     * Saves the relation of input sets to data nodes.
-     * Only one fragment will be taken into consideration.
-     *
-     * @param frag The fragment which contains the Input set
-     */
-    private void saveInputSetsConsistOf(final Fragment frag) {
-        Connector connector = new Connector();
-        for (InputSet iSet : frag.getInputSets()) {
-            for (Node dataNode : iSet.getDataObjects()) {
-                connector.insertDataSetConsistOfDataNodeIntoDatabase(
-                        iSet.getDatabaseId(),
+                        set.getDatabaseId(),
                         dataNode.getDatabaseID());
             }
         }
@@ -635,17 +590,82 @@ public class Scenario implements IDeserialisable, IPersistable {
      * Fragments (with Control Nodes) have to be created and saved first.
      */
     private void createDataObjects() {
+        Map<String, String> dataObjectNodes = getAllDataObjectNodes();
         dataObjects = new HashMap<String, DataObject>();
         for (Fragment fragment : fragments) {
             for (Node node : fragment.getControlNodes().values()) {
                 if (node.isDataNode()) {
                     if (null == dataObjects.get(node.getText())) {
-                        dataObjects.put(node.getText(), new DataObject());
+                        if (domainModel == null) {
+                            dataObjects.put(node.getText(), new DataObject());
+                            break;
+                        }
+                        String link = dataObjectNodes.get(node.getText());
+                        // if there is no reference to the dataClass, we match over the name
+                        if (link.equals("")) {
+                            boolean dataClassFound = false;
+                            for (DataClass dC : domainModel.getDataClasses().values()) {
+                                if (dC.getDataClassName().equals(node.getText())) {
+                                    dataObjects.put(node.getText(), new DataObject(dC));
+                                    dataClassFound = true;
+                                    break;
+                                }
+                            }
+                            if (!dataClassFound) {
+                                dataObjects.put(node.getText(), new DataObject());
+                            }
+                        }
+                        else {
+                            String[] slashSplit = link.split("\\/");
+                            String dataClassModelID = slashSplit[slashSplit.length - 1].split("#")[0];
+                            String dataClassNodeID = slashSplit[slashSplit.length - 1].split("#")[1];
+                            if (Long.parseLong(dataClassModelID) != domainModel.getDomainModelModelID()) {
+                                log.error("Error: The referenced domainModel of a dataObject-Node " +
+                                        "in the scenario is not existing");
+                                dataObjects.put(node.getText(), new DataObject());
+                                return;
+                            }
+                            else if (domainModel.getDataClasses().get(Long.parseLong(dataClassNodeID)) == null)
+                                dataObjects.put(node.getText(), new DataObject());
+                            dataObjects.put(node.getText(), new DataObject(domainModel.getDataClasses().get(Long.parseLong(dataClassNodeID))));
+                        }
                     }
                     dataObjects.get(node.getText()).addDataNode(node);
                 }
             }
         }
+    }
+
+    /**
+     * Get the link of the dataClass for each dataObject that the scenario contains.
+     * @return A Map of the name of the dataObject to the link of its dataClass
+     */
+    private Map<String, String> getAllDataObjectNodes() {
+        Map<String, String> dataObjectNodes = new HashMap<>();
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        String xPathQuery =
+                "/model/nodes/node[property[@name = '#type' and " +
+                        "@value[contains(.,'PCMDataObjectNode')]]]";
+        try {
+            NodeList nodes = (NodeList) xPath
+                    .compile(xPathQuery)
+                    .evaluate(this.scenarioXML, XPathConstants.NODESET);
+            for (int i = 0; i < nodes.getLength(); i++) {
+                // get the name of the current node
+                xPathQuery = "property[@name = 'text']/@value";
+                String name = xPath
+                        .compile(xPathQuery)
+                        .evaluate(nodes.item(i));
+                xPathQuery = "property[@name = 'Data class']/@value";
+                String dataClassLink = xPath
+                        .compile(xPathQuery)
+                        .evaluate(nodes.item(i));
+                dataObjectNodes.put(name, dataClassLink);
+            }
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        }
+        return dataObjectNodes;
     }
 
     /**
@@ -657,7 +677,7 @@ public class Scenario implements IDeserialisable, IPersistable {
             XPath xPath = XPathFactory.newInstance().newXPath();
             String xPathQuery =
                     "/model/nodes/node[property[@name = '#type' and " +
-                            "@value = 'de.uni_potsdam.hpi.bpt.bp2014.jeditor.visualization.pcm.PCMFragmentNode']]";
+                            "@value[contains(.,'PCMFragmentNode')]]]";
             NodeList fragmentNodes = (NodeList) xPath
                     .compile(xPathQuery)
                     .evaluate(this.scenarioXML, XPathConstants.NODESET);
@@ -672,7 +692,7 @@ public class Scenario implements IDeserialisable, IPersistable {
                 this.fragments.add(createAndInitializeFragment(currentNodeID));
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
     }
 
@@ -685,7 +705,7 @@ public class Scenario implements IDeserialisable, IPersistable {
      */
     private Fragment createAndInitializeFragment(String fragmentID) {
         Retrieval retrieval = new Retrieval();
-        String fragmentXML = retrieval.getHTMLwithAuth(
+        String fragmentXML = retrieval.getXMLWithAuth(
                 this.processeditorServerUrl,
                 this.processeditorServerUrl +
                         "models/" + fragmentID + ".pm");
@@ -709,7 +729,7 @@ public class Scenario implements IDeserialisable, IPersistable {
             doc.getDocumentElement().normalize();
             return doc;
         } catch (SAXException | IOException | ParserConfigurationException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
         return null;
     }
@@ -727,7 +747,7 @@ public class Scenario implements IDeserialisable, IPersistable {
                     .compile(xPathQuery)
                     .evaluate(this.scenarioXML);
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
     }
 
@@ -801,24 +821,6 @@ public class Scenario implements IDeserialisable, IPersistable {
     }
 
     /**
-     * Returns the DataNode, which is part of the TerminationCondition.
-     *
-     * @return the dataNode of the TerminationCondition.
-     */
-    public Node getTerminatingDataNode() {
-        return terminatingDataNode;
-    }
-
-    /**
-     * Returns the DataObject, which is represented by the TerminatingDataNode.
-     *
-     * @return the DataObject which is part of the TerminationCondition.
-     */
-    public DataObject getTerminatingDataObject() {
-        return terminatingDataObject;
-    }
-
-    /**
      * Returns an integer Representing the version of the Scenario.
      *
      * @return the Version of the Scenario.
@@ -849,4 +851,7 @@ public class Scenario implements IDeserialisable, IPersistable {
         return domainModel;
     }
 
+    public List<Map<DataObject, String>> getTerminationCondition() {
+        return terminationCondition;
+    }
 }

@@ -1,5 +1,7 @@
 package de.uni_potsdam.hpi.bpt.bp2014.database;
 
+import org.apache.log4j.Logger;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -8,13 +10,13 @@ import java.util.*;
 
 
 public class DbObject {
+    static Logger log = Logger.getLogger(DbObject.class.getName());
 
     /**
-     *
      * @param sql
      * @return
      */
-    public static ArrayList<HashMap<String,Object>> executeStatementReturnsHashMap(String sql) {
+    public static ArrayList<HashMap<String, Object>> executeStatementReturnsHashMap(String sql) {
         java.sql.Connection conn = Connection.getInstance().connect();
         Statement stmt = null;
         try {
@@ -27,7 +29,7 @@ public class DbObject {
             if (Returning_Rows)
                 Result = stmt.getResultSet();
             else
-                return new ArrayList<HashMap<String,Object>>();
+                return new ArrayList<HashMap<String, Object>>();
 
             //get metadata
             ResultSetMetaData Meta = null;
@@ -36,18 +38,18 @@ public class DbObject {
             //get column names
             int Col_Count = Meta.getColumnCount();
             ArrayList<String> Cols = new ArrayList<String>();
-            for (int Index=1; Index<=Col_Count; Index++)
+            for (int Index = 1; Index <= Col_Count; Index++)
                 Cols.add(Meta.getColumnName(Index));
 
             //fetch out rows
-            ArrayList<HashMap<String,Object>> Rows =
-                    new ArrayList<HashMap<String,Object>>();
+            ArrayList<HashMap<String, Object>> Rows =
+                    new ArrayList<HashMap<String, Object>>();
 
             while (Result.next()) {
-                HashMap<String,Object> Row = new HashMap<String,Object>();
-                for (String Col_Name:Cols) {
+                HashMap<String, Object> Row = new HashMap<String, Object>();
+                for (String Col_Name : Cols) {
                     Object Val = Result.getObject(Col_Name);
-                    Row.put(Col_Name,Val);
+                    Row.put(Col_Name, Val);
                 }
                 Rows.add(Row);
             }
@@ -59,7 +61,7 @@ public class DbObject {
             return Rows;
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -67,14 +69,14 @@ public class DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
             }
         }
         return null;
@@ -107,7 +109,7 @@ public class DbObject {
             rs.close();
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -115,14 +117,62 @@ public class DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Executes the given select SQL statement and returns the result in List with String.
+     *
+     * @param sql         This is a given select SQL Statement.
+     * @param columnLabel This is the label of the column which is used as the result.
+     * @return List with String.
+     */
+    public LinkedList<String> executeStatementReturnsListString(String sql, String columnLabel) {
+        java.sql.Connection conn = Connection.getInstance().connect();
+        Statement stmt = null;
+        ResultSet rs = null;
+        LinkedList<String> results = new LinkedList<>();
+        if (conn == null) {
+            return results;
+        }
+
+        try {
+            //Execute a query
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                results.add(rs.getString(columnLabel));
+            }
+            //Clean-up environment
+            rs.close();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            log.error("SQL Error!: ", se);
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException se2) {
+                log.error("SQL Error!: ", se2);
+            }
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException se) {
+                log.error("SQL Error!: ", se);
             }
         }
         return results;
@@ -155,7 +205,7 @@ public class DbObject {
             rs.close();
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -163,14 +213,14 @@ public class DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
             }
         }
         return results;
@@ -202,7 +252,7 @@ public class DbObject {
             rs.close();
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -210,14 +260,14 @@ public class DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
             }
         }
         return results;
@@ -252,7 +302,7 @@ public class DbObject {
             conn.close();
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -260,14 +310,14 @@ public class DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
             }
         }
         return results;
@@ -302,7 +352,7 @@ public class DbObject {
             conn.close();
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -310,14 +360,14 @@ public class DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
             }
         }
         return results;
@@ -350,7 +400,7 @@ public class DbObject {
             rs.close();
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -358,14 +408,14 @@ public class DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
             }
         }
         return results;
@@ -396,7 +446,7 @@ public class DbObject {
             rs.close();
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -404,14 +454,14 @@ public class DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
             }
         }
         return false;
@@ -441,7 +491,7 @@ public class DbObject {
             }
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -449,14 +499,14 @@ public class DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
             }
         }
         return result;
@@ -481,7 +531,7 @@ public class DbObject {
             rowId = stmt.executeUpdate(sql);
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -489,14 +539,14 @@ public class DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
             }
         }
         return rowId;
@@ -506,8 +556,8 @@ public class DbObject {
      * This method makes a sql Query and returns the keys and values in a Map.
      * We assume that every key is an integer.
      *
-     * @param sql The query string to be executed
-     * @param key The column name which will be key of the map
+     * @param sql   The query string to be executed
+     * @param key   The column name which will be key of the map
      * @param value The column name which will be the value of the map
      * @return A Map from the key Column to the Value Column
      */
@@ -530,22 +580,22 @@ public class DbObject {
             }
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             try {
                 rs.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("SQL Error!: ", e);
             }
             try {
                 stmt.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("SQL Error!: ", e);
             }
             try {
                 conn.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("SQL Error!: ", e);
             }
         }
         return result;
@@ -564,22 +614,21 @@ public class DbObject {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("SQL Error!: ", e);
         } finally {
             try {
                 conn.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("SQL Error!: ", e);
             }
             try {
                 results.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("SQL Error!: ", e);
             }
         }
         return keysValues;
     }
-
 
 
     /**
@@ -603,17 +652,17 @@ public class DbObject {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("SQL Error!: ", e);
         } finally {
             try {
                 conn.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("SQL Error!: ", e);
             }
             try {
                 results.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("SQL Error!: ", e);
             }
         }
         return keysValues;

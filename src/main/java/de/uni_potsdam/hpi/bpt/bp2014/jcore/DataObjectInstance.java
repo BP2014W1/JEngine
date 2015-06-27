@@ -7,44 +7,23 @@ import java.util.LinkedList;
 
 
 /**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
-
-/**
  * Represents data object instances.
  */
 public class DataObjectInstance {
 
-    private int state_id;
     private final int dataObjectInstance_id;
     private final int dataObject_id;
     private final int scenario_id;
     private final int scenarioInstance_id;
     private final String name;
-    private LinkedList<DataAttributeInstance> dataAttributeInstances = new LinkedList<>();
     /**
      * Database Connection objects.
      */
     private final ScenarioInstance scenarioInstance;
     private final DbDataObjectInstance dbDataObjectInstance = new DbDataObjectInstance();
     private final DbDataObject dbDataObject = new DbDataObject();
+    private int state_id;
+    private LinkedList<DataAttributeInstance> dataAttributeInstances = new LinkedList<>();
 
     /**
      * Creates and initializes a new data object instance.
@@ -74,9 +53,9 @@ public class DataObjectInstance {
         this.initializeAttributes();
     }
 
-    private void initializeAttributes(){
+    private void initializeAttributes() {
         LinkedList<Integer> dataAttribute_ids = dbDataObject.getAllDataAttributesForDataObject(dataObject_id);
-        for(int dataAttribute_id : dataAttribute_ids){
+        for (int dataAttribute_id : dataAttribute_ids) {
             DataAttributeInstance dataAttributeInstance = new DataAttributeInstance(dataAttribute_id, dataObjectInstance_id, this);
             dataAttributeInstances.add(dataAttributeInstance);
             scenarioInstance.getDataAttributeInstances().put(dataAttributeInstance.getDataAttributeInstance_id(), dataAttributeInstance);
@@ -119,30 +98,51 @@ public class DataObjectInstance {
         return scenarioInstance;
     }
 
+    /**
+     * @return
+     */
     public int getScenarioInstance_id() {
         return scenarioInstance_id;
     }
 
+    /**
+     * @return
+     */
     public int getScenario_id() {
         return scenario_id;
     }
 
+    /**
+     * @return
+     */
     public int getDataObject_id() {
         return dataObject_id;
     }
 
+    /**
+     * @return
+     */
     public int getDataObjectInstance_id() {
         return dataObjectInstance_id;
     }
 
+    /**
+     * @return
+     */
     public int getState_id() {
         return state_id;
     }
 
+    /**
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<DataAttributeInstance> getDataAttributeInstances() {
         return dataAttributeInstances;
     }

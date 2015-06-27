@@ -1,6 +1,8 @@
 package de.uni_potsdam.hpi.bpt.bp2014.database;
 
 
+import org.apache.log4j.Logger;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -8,32 +10,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-/**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
+
 
 /**
  * This class is the representation of a dataNode in the database.
  * It provides the functionality to get all dataObjects belonging to a dataSet as well as their states they can have.
  */
 public class DbDataNode extends DbObject {
+    static Logger log = Logger.getLogger(DbDataNode.class.getName());
+
     /**
      * This method returns all database ID's of all dataObjects belonging to a dataSet.
      *
@@ -58,6 +43,7 @@ public class DbDataNode extends DbObject {
 
     /**
      * This method returns all database data objects a dataSet can have.
+     *
      * @param dataSet_id This is the database ID of a dataSet.
      * @return a list of all instances from DataObject.
      */
@@ -82,7 +68,7 @@ public class DbDataNode extends DbObject {
             rs.close();
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!: ", se);
         } finally {
             //finally block used to close resources
             try {
@@ -90,14 +76,14 @@ public class DbDataNode extends DbObject {
                     stmt.close();
                 }
             } catch (SQLException se2) {
-                se2.printStackTrace();
+                log.error("SQL Error!: ", se2);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!: ", se);
             }
         }
         return results;

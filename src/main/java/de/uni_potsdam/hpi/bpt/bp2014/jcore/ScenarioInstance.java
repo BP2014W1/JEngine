@@ -1,38 +1,9 @@
 package de.uni_potsdam.hpi.bpt.bp2014.jcore;
 
-import de.uni_potsdam.hpi.bpt.bp2014.database.Condition;
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbControlNode;
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbDataObject;
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbFragment;
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbScenario;
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbScenarioInstance;
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbTerminationCondition;
-
+import de.uni_potsdam.hpi.bpt.bp2014.database.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-
-
-/**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
 
 
 /**
@@ -44,21 +15,6 @@ import java.util.LinkedList;
  * The scenario instance provide methods for the administration of the data object instances
  */
 public class ScenarioInstance {
-    /**
-     * Lists to save all fragments and all control nodes sorted by state.
-     */
-    private LinkedList<ControlNodeInstance> controlNodeInstances = new LinkedList<ControlNodeInstance>();
-    private LinkedList<ControlNodeInstance> enabledControlNodeInstances = new LinkedList<ControlNodeInstance>();
-    private LinkedList<ControlNodeInstance> controlFlowEnabledControlNodeInstances = new LinkedList<ControlNodeInstance>();
-    private LinkedList<ControlNodeInstance> dataEnabledControlNodeInstances = new LinkedList<ControlNodeInstance>();
-    private LinkedList<ControlNodeInstance> runningControlNodeInstances = new LinkedList<ControlNodeInstance>();
-    private LinkedList<ControlNodeInstance> terminatedControlNodeInstances = new LinkedList<ControlNodeInstance>();
-    private LinkedList<DataObjectInstance> dataObjectInstances = new LinkedList<DataObjectInstance>();
-    private LinkedList<DataObjectInstance> dataObjectInstancesOnChange = new LinkedList<DataObjectInstance>();
-    private LinkedList<FragmentInstance> fragmentInstances = new LinkedList<FragmentInstance>();
-    private LinkedList<ControlNodeInstance> referentialRunningControlNodeInstances = new LinkedList<ControlNodeInstance>();
-    private LinkedList<GatewayInstance> executingGateways = new LinkedList<GatewayInstance>();
-    private HashMap<Integer, DataAttributeInstance> dataAttributeInstances = new HashMap<>();
     private final int scenarioInstance_id;
     private final int scenario_id;
     private final String name;
@@ -70,6 +26,21 @@ public class ScenarioInstance {
     private final DbDataObject dbDataObject = new DbDataObject();
     private final DbTerminationCondition dbTerminationCondition = new DbTerminationCondition();
     private final DbScenario dbScenario = new DbScenario();
+    /**
+     * Lists to save all fragments and all control nodes sorted by state.
+     */
+    private LinkedList<ControlNodeInstance> controlNodeInstances = new LinkedList<>();
+    private LinkedList<ControlNodeInstance> enabledControlNodeInstances = new LinkedList<>();
+    private LinkedList<ControlNodeInstance> controlFlowEnabledControlNodeInstances = new LinkedList<>();
+    private LinkedList<ControlNodeInstance> dataEnabledControlNodeInstances = new LinkedList<>();
+    private LinkedList<ControlNodeInstance> runningControlNodeInstances = new LinkedList<>();
+    private LinkedList<ControlNodeInstance> terminatedControlNodeInstances = new LinkedList<>();
+    private LinkedList<DataObjectInstance> dataObjectInstances = new LinkedList<>();
+    private LinkedList<DataObjectInstance> dataObjectInstancesOnChange = new LinkedList<>();
+    private LinkedList<FragmentInstance> fragmentInstances = new LinkedList<>();
+    private LinkedList<ControlNodeInstance> referentialRunningControlNodeInstances = new LinkedList<>();
+    private LinkedList<GatewayInstance> executingGateways = new LinkedList<>();
+    private HashMap<Integer, DataAttributeInstance> dataAttributeInstances = new HashMap<>();
 
     /**
      * Creates and initializes a new scenario instance from database.
@@ -148,13 +119,13 @@ public class ScenarioInstance {
         fragmentInstance.terminate();
 
         //removes the old control node instances
-        LinkedList<ControlNodeInstance> updatedList = new LinkedList<ControlNodeInstance>(terminatedControlNodeInstances);
+        LinkedList<ControlNodeInstance> updatedList = new LinkedList<>(terminatedControlNodeInstances);
         for (ControlNodeInstance controlNodeInstance : updatedList) {
             if (controlNodeInstance.fragmentInstance_id == fragmentInstance_id) {
                 terminatedControlNodeInstances.remove(controlNodeInstance);
             }
         }
-        updatedList = new LinkedList<ControlNodeInstance>(controlNodeInstances);
+        updatedList = new LinkedList<>(controlNodeInstances);
         for (ControlNodeInstance controlNodeInstance : updatedList) {
             if (controlNodeInstance.fragmentInstance_id == fragmentInstance_id) {
                 controlNodeInstances.remove(controlNodeInstance);
@@ -180,86 +151,6 @@ public class ScenarioInstance {
         }
     }
 
-    /**
-     * Compares the given state for a data object with the state from the data object in the scenario.
-     *
-     * @param dataObject_id This is the database id from the data object.
-     * @param state_id      This is the database id from the state.
-     * @return true if the data object has the same state. false if not
-     */
-    public Boolean checkDataObjectState(int dataObject_id, int state_id) {
-        for (DataObjectInstance dataObjectInstance : dataObjectInstances) {
-            if (dataObjectInstance.getDataObject_id() == dataObject_id && dataObjectInstance.getState_id() == state_id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Change the state of the given data object.
-     *
-     * @param dataObject_id This is the database id from the data object.
-     * @param state_id      This is the database id from the state.
-     * @return true if the data object state could been changed. false if not
-     */
-    public Boolean changeDataObjectInstanceState(int dataObject_id, int state_id) {
-        for (DataObjectInstance dataObjectInstance : dataObjectInstances) {
-            if (dataObjectInstance.getDataObject_id() == dataObject_id) {
-                dataObjectInstance.setState(state_id);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Sets the data object to on change.
-     * Write this into the database.
-     *
-     * @param dataObject_id This is the database id from the data object.
-     * @return true if the on change could been set. false if not.
-     */
-    public Boolean setDataObjectInstanceToOnChange(int dataObject_id) {
-        DataObjectInstance dataObjectInstanceOnChange = null;
-        for (DataObjectInstance dataObjectInstance : dataObjectInstances) {
-            if (dataObjectInstance.getDataObject_id() == dataObject_id) {
-                dataObjectInstanceOnChange = dataObjectInstance;
-                break;
-            }
-        }
-        if (dataObjectInstanceOnChange != null) {
-            dataObjectInstances.remove(dataObjectInstanceOnChange);
-            dataObjectInstancesOnChange.add(dataObjectInstanceOnChange);
-            dataObjectInstanceOnChange.setOnChange(true);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Sets the data object to not on change.
-     * Write this into the database.
-     *
-     * @param dataObject_id This is the database id from the data object.
-     * @return true if the on change could been set. false if not.
-     */
-    public Boolean setDataObjectInstanceToNotOnChange(int dataObject_id) {
-        DataObjectInstance dataObjectInstanceOnChange = null;
-        for (DataObjectInstance dataObjectInstance : dataObjectInstancesOnChange) {
-            if (dataObjectInstance.getDataObject_id() == dataObject_id) {
-                dataObjectInstanceOnChange = dataObjectInstance;
-                break;
-            }
-        }
-        if (dataObjectInstanceOnChange != null) {
-            dataObjectInstancesOnChange.remove(dataObjectInstanceOnChange);
-            dataObjectInstances.add(dataObjectInstanceOnChange);
-            dataObjectInstanceOnChange.setOnChange(false);
-            return true;
-        }
-        return false;
-    }
 
     /**
      * Checks if the control flow enabled control nodes can set to data flow enabled.
@@ -313,44 +204,6 @@ public class ScenarioInstance {
         return false;
     }
 
-    /**
-     * checks if the referenced controlNode can be started.
-     * The referenced controlNode have to be control flow enabled and (data flow enabled or must have the same data output)
-     *
-     * @param controlNode_id           This is the database id from a control node.
-     * @param referencedControlNode_id This is the database id from a control node.
-     */
-    public void beginEnabledReferenceControlNodeInstanceForControlNodeInstanceID(int controlNode_id, int referencedControlNode_id) {
-        for (ControlNodeInstance controlNodeInstance : controlFlowEnabledControlNodeInstances) {
-            if (controlNodeInstance.controlNode_id == referencedControlNode_id) {
-                if (controlNodeInstance.getClass() == ActivityInstance.class) {
-                    DbControlNode dbControlNode = new DbControlNode();
-                    if (enabledControlNodeInstances.contains(controlNodeInstance) || dbControlNode.controlNodesHaveSameOutputs(controlNode_id, referencedControlNode_id)) {
-                        ((ActivityInstance) controlNodeInstance).referenceStarted();
-                        return;
-                    }
-                }
-            }
-        }
-
-    }
-
-    /**
-     * Checks if the referenced controlNode can be terminated.
-     * The referenced controlNode have to be referential running.
-     *
-     * @param controlNode_id This is the database id from the control node.
-     */
-    public void terminateReferenceControlNodeInstanceForControlNodeInstanceID(int controlNode_id) {
-        for (ControlNodeInstance controlNodeInstance : referentialRunningControlNodeInstances) {
-            if (controlNodeInstance.controlNode_id == controlNode_id) {
-                if (controlNodeInstance.getClass() == ActivityInstance.class) {
-                    ((ActivityInstance) controlNodeInstance).referenceTerminated();
-                    return;
-                }
-            }
-        }
-    }
 
     /**
      * Check the termination condition.
@@ -415,16 +268,15 @@ public class ScenarioInstance {
         for (ControlNodeInstance controlNodeInstance : ((LinkedList<ControlNodeInstance>) enabledControlNodeInstances.clone())) {
             if (controlNodeInstance.getClass() == ActivityInstance.class && ((ActivityInstance) controlNodeInstance).isAutomaticExecution()) {
                 ((ActivityInstance) controlNodeInstance).begin();
-                //((ActivityInstance) controlNodeInstance).terminate();
             }
         }
     }
 
     /**
-     * Get the control node instance id for a given control node id.
+     * Get the control node instance for a given control node id.
      *
      * @param controlNode_id This is a id of a control node.
-     * @return the control instance id for the given control node id.
+     * @return the control instance for the given control node id.
      */
     public ControlNodeInstance getControlNodeInstanceForControlNodeId(int controlNode_id) {
         for (ControlNodeInstance controlNodeInstance : controlNodeInstances) {
@@ -434,62 +286,103 @@ public class ScenarioInstance {
         }
         return null;
     }
-    /*
-     * Getter
-     */
+    // ************************************************ Getter ***********************************************//
 
+
+    /**
+     * @return
+     */
     public int getScenarioInstance_id() {
         return scenarioInstance_id;
     }
 
+    /**
+     * @return
+     */
     public int getScenario_id() {
         return scenario_id;
     }
 
+    /**
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<ControlNodeInstance> getControlNodeInstances() {
         return controlNodeInstances;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<ControlNodeInstance> getEnabledControlNodeInstances() {
         return enabledControlNodeInstances;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<ControlNodeInstance> getControlFlowEnabledControlNodeInstances() {
         return controlFlowEnabledControlNodeInstances;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<ControlNodeInstance> getDataEnabledControlNodeInstances() {
         return dataEnabledControlNodeInstances;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<ControlNodeInstance> getRunningControlNodeInstances() {
         return runningControlNodeInstances;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<ControlNodeInstance> getTerminatedControlNodeInstances() {
         return terminatedControlNodeInstances;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<DataObjectInstance> getDataObjectInstances() {
         return dataObjectInstances;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<DataObjectInstance> getDataObjectInstancesOnChange() {
         return dataObjectInstancesOnChange;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<ControlNodeInstance> getReferentialRunningControlNodeInstances() {
         return referentialRunningControlNodeInstances;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<GatewayInstance> getExecutingGateways() {
         return executingGateways;
     }
 
+    /**
+     * @return
+     */
     public HashMap<Integer, DataAttributeInstance> getDataAttributeInstances() {
         return dataAttributeInstances;
     }

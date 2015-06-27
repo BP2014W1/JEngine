@@ -1,5 +1,6 @@
 package de.uni_potsdam.hpi.bpt.bp2014.jcore;
 
+import de.uni_potsdam.hpi.bpt.bp2014.AbstractDatabaseDependentTest;
 import org.apache.commons.mail.EmailException;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,15 +16,24 @@ import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
 
 
-public class EmailAcceptanceTest {
+/**
+ * Test the function of the email tasks.
+ */
+public class EmailAcceptanceTest extends AbstractDatabaseDependentTest {
+    /**
+     * Receiver of the emails.
+     */
     String receiver = "bp2014w1@byom.de";
+
     @Before
     public void setUp() {
         //clear Mock JavaMail box
         Mailbox.clearAll();
-
     }
-    //Email Test Scenario 142
+
+    /**
+     * Email Test Scenario 142.
+     */
     @Test
     public void testScenario142() throws MessagingException, IOException, EmailException {
         ExecutionService executionService = new ExecutionService();
@@ -57,7 +67,13 @@ public class EmailAcceptanceTest {
         assertEquals("Test Message", inbox.get(1).getContent());
     }
 
-    //Email Test Scenario 141
+    /**
+     * Email Test Scenario 141.
+     *
+     * @throws MessagingException
+     * @throws IOException
+     * @throws EmailException
+     */
     @Test
     public void testScenario141() throws MessagingException, IOException, EmailException {
         ExecutionService executionService = new ExecutionService();
@@ -96,7 +112,13 @@ public class EmailAcceptanceTest {
         assertEquals("Test Message", inbox.get(3).getContent());
     }
 
-    //Email Test Scenario 145, XOR e-mail test
+    /**
+     * Email Test Scenario 145, XOR e-mail test.
+     *
+     * @throws MessagingException
+     * @throws IOException
+     * @throws EmailException
+     */
     @Test
     public void testScenario145() throws MessagingException, IOException, EmailException {
         ExecutionService executionService = new ExecutionService();
@@ -148,7 +170,13 @@ public class EmailAcceptanceTest {
         assertEquals("Test Message", inbox.get(0).getContent());
     }
 
-    //Email Test Scenario 146, XOR e-mail test
+    /**
+     * Email Test Scenario 146, XOR e-mail test.
+     *
+     * @throws MessagingException
+     * @throws IOException
+     * @throws EmailException
+     */
     @Test
     public void testScenario146() throws MessagingException, IOException, EmailException {
         ExecutionService executionService = new ExecutionService();
@@ -204,7 +232,13 @@ public class EmailAcceptanceTest {
 
     }
 
-    //Email Test Scenario 151
+    /**
+     * Email Test Scenario 151.
+     *
+     * @throws MessagingException
+     * @throws IOException
+     * @throws EmailException
+     */
     @Test
     public void testScenario151() throws MessagingException, IOException, EmailException {
         ExecutionService executionService = new ExecutionService();
@@ -228,7 +262,7 @@ public class EmailAcceptanceTest {
         List<Message> inbox = Mailbox.get(receiver);
         assertTrue(inbox.size() == 1);
         assertEquals("Test", inbox.get(0).getSubject());
-        assertEquals("Lieber Kunde Stephan Karphen, Sie bekommen am 2015 12500 überwiesen. #Test lol test", inbox.get(0).getContent());
+        assertEquals("Lieber Kunde Stephan Karphen, Sie bekommen am 2015 12500 ueberwiesen. #Test lol test", inbox.get(0).getContent());
 
     }
 }

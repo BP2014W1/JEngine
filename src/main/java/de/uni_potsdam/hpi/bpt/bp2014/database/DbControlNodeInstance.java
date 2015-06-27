@@ -2,26 +2,7 @@ package de.uni_potsdam.hpi.bpt.bp2014.database;
 
 import java.util.LinkedList;
 
-/**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
+
 
 /**
  * This class is the representation of a controlNode instance in the database.
@@ -32,7 +13,7 @@ public class DbControlNodeInstance extends DbObject {
     /**
      * This method checks if a controlNode instance is existing in the database belonging to a controlNode and a fragment instance.
      *
-     * @param controlNode_id This is the database ID of a controlNode.
+     * @param controlNode_id      This is the database ID of a controlNode.
      * @param fragmentInstance_id This is the database ID of a fragment instance.
      * @return true if the controlNode instance exists els false.
      */
@@ -41,11 +22,16 @@ public class DbControlNodeInstance extends DbObject {
         return executeExistStatement(sql);
     }
 
+    public Boolean existControlNodeInstance(int controlNodeInstance_id) {
+        String sql = "SELECT id FROM controlnodeinstance WHERE id = " + controlNodeInstance_id;
+        return executeExistStatement(sql);
+    }
+
     /**
      * This method creates and saves a new controlNode instance to the database in the context of a fragment instance.
      *
-     * @param controlNode_id This is the database ID of a controlNode.
-     * @param controlNodeType This is the desirable type of the new controlNode instance.
+     * @param controlNode_id      This is the database ID of a controlNode.
+     * @param controlNodeType     This is the desirable type of the new controlNode instance.
      * @param fragmentInstance_id This is the database ID of a fragment instance.
      * @return -1 if something went wrong else the database ID of the newly created controlNode instance.
      */
@@ -57,13 +43,18 @@ public class DbControlNodeInstance extends DbObject {
     /**
      * This method returns the database ID of a controlNode instance belonging to a controlNode and fragment instance.
      *
-     * @param controlNode_id This is the database ID of a controlNode.
+     * @param controlNode_id      This is the database ID of a controlNode.
      * @param fragmentInstance_id This is the database ID of a fragment instance.
      * @return -1 if something went wrong else the database ID of a controlNode instance.
      */
     public int getControlNodeInstanceID(int controlNode_id, int fragmentInstance_id) {
         String sql = "SELECT id FROM controlnodeinstance WHERE controlnode_id = " + controlNode_id + " AND fragmentinstance_id = " + fragmentInstance_id;
         return this.executeStatementReturnsInt(sql, "id");
+    }
+
+    public LinkedList<Integer> getControlNodeInstanceIDs(int controlNode_id, int fragmentInstance_id) {
+        String sql = "SELECT id FROM controlnodeinstance WHERE controlnode_id = " + controlNode_id + " AND fragmentinstance_id = " + fragmentInstance_id;
+        return this.executeStatementReturnsListInt(sql, "id");
     }
 
     /**
@@ -75,6 +66,11 @@ public class DbControlNodeInstance extends DbObject {
     public LinkedList<Integer> getActivitiesForFragmentInstanceID(int fragmentInstance_id) {
         String sql = "SELECT controlnode_id FROM controlnodeinstance WHERE controlnodeinstance.Type = 'Activity' AND fragmentinstance_id = " + fragmentInstance_id;
         return this.executeStatementReturnsListInt(sql, "controlnode_id");
+    }
+
+    public LinkedList<Integer> getActivityInstancesForFragmentInstanceID(int fragmentInstance_id) {
+        String sql = "SELECT id FROM controlnodeinstance WHERE controlnodeinstance.Type = 'Activity' AND fragmentinstance_id = " + fragmentInstance_id;
+        return this.executeStatementReturnsListInt(sql, "id");
     }
 
     /**
@@ -97,5 +93,10 @@ public class DbControlNodeInstance extends DbObject {
     public int getControlNodeID(int controlNodeInstanceID) {
         String sql = "SELECT controlnode_id FROM controlnodeinstance WHERE id = " + controlNodeInstanceID;
         return this.executeStatementReturnsInt(sql, "controlnode_id");
+    }
+
+    public LinkedList<Integer> getGatewayInstancesForFragmentInstanceID(int fragmentInstance_id) {
+        String sql = "SELECT id FROM controlnodeinstance WHERE (controlnodeinstance.Type = 'AND' OR controlnodeinstance.Type = 'XOR') AND fragmentinstance_id = " + fragmentInstance_id;
+        return this.executeStatementReturnsListInt(sql, "id");
     }
 }

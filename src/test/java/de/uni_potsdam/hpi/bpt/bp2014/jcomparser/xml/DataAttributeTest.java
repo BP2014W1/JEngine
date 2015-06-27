@@ -8,10 +8,11 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
 /**
- * Created by Ihdefix on 12.03.2015.
+ *
  */
-public class DataAttributeTest {
+public class DataAttributeTest  {
     private Document document = new DocumentImpl(null);
     private Element dataClass;
 
@@ -25,6 +26,12 @@ public class DataAttributeTest {
         dataClass.appendChild(createProperty("stereotype", "root_instance"));
     }
 
+    /**
+     *
+     * @param name
+     * @param value
+     * @return
+     */
     private Element createProperty(String name, String value) {
         if (null == document) {
             return null;

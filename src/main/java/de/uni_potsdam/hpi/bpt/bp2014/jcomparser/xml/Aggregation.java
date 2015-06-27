@@ -6,9 +6,6 @@ import org.w3c.dom.Node;
 
 import java.util.Map;
 
-/**
- * Created by Ihdefix on 04.03.2015.
- */
 public class Aggregation implements IDeserialisable, IPersistable {
     private DataClass source;
     private DataClass target;
@@ -20,8 +17,8 @@ public class Aggregation implements IDeserialisable, IPersistable {
     public void initializeInstanceFromXML(final org.w3c.dom.Node element) {
         this.aggregationXML = element;
         NodeList properties = element.getChildNodes();
-        for(int i = 0; i < properties.getLength(); i++){
-            if(properties.item(i).getNodeName().equals("property")){
+        for (int i = 0; i < properties.getLength(); i++) {
+            if (properties.item(i).getNodeName().equals("property")) {
                 org.w3c.dom.Node property = properties.item(i);
                 initializeField(property);
             }
@@ -41,7 +38,7 @@ public class Aggregation implements IDeserialisable, IPersistable {
             case "#targetNode":
                 setTargetNode(value);
                 break;
-            case "sourceMultiplicity": //TODO check for correctness!!
+            case "sourceMultiplicity":
                 setMultiplicity(value);
                 break;
             default:
@@ -52,7 +49,7 @@ public class Aggregation implements IDeserialisable, IPersistable {
 
     private void setMultiplicity(String value) {
         String[] multiplicity = value.split("\\.\\.");
-        if(multiplicity.length != 0) {
+        if (multiplicity.length != 0) {
             if (multiplicity[multiplicity.length - 1].equals("*")) {
                 this.multiplicity = Integer.MAX_VALUE;
             } else {
@@ -62,14 +59,14 @@ public class Aggregation implements IDeserialisable, IPersistable {
     }
 
     private void setTargetNode(String value) {
-        if(value != null && this.dataClasses != null) {
+        if (value != null && this.dataClasses != null) {
             long targetNodeModelID = Long.parseLong(value);
             this.target = this.dataClasses.get(targetNodeModelID);
         }
     }
 
     private void setSourceNode(String value) {
-        if(value != null && this.dataClasses != null) {
+        if (value != null && this.dataClasses != null) {
 
             long sourceNodeModelID = Long.parseLong(value);
             this.source = this.dataClasses.get(sourceNodeModelID);

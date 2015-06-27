@@ -1,42 +1,19 @@
 package de.uni_potsdam.hpi.bpt.bp2014.jcore;
 
 
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbEmailConfiguration;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Map;
 
-
-/**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
-
-/*
- * Jaspars Spielwiese
- */
 
 public class debugClass {
+    static Logger log = Logger.getLogger(debugClass.class.getName());
+
     public static String selectScenario() {
 
         System.out.print("Select Scenario: ");
@@ -61,7 +38,7 @@ public class debugClass {
             back = br.readLine();
         } catch (IOException e) {
             System.out.print("ERROR: " + e);
-            e.printStackTrace();
+            log.error("Error:", e);
         }
 
         return back;
@@ -88,8 +65,8 @@ public class debugClass {
             Collection<ActivityInstance> acts = executionService.getEnabledActivities(scenarioInstanceID);
 
             System.out.println("\nenabled Aktivität ID");
-            for (ActivityInstance activityInstance: acts) {
-                System.out.println(activityInstance.getControlNodeInstance_id() + ", " + activityInstance.getLabel());
+            for (ActivityInstance activityInstance : acts) {
+                System.out.println(activityInstance.getControlNodeInstance_id() + ", " + activityInstance.getLabel() + ", (" + activityInstance.getControlNode_id() + ")");
             }
 
             System.out.println("Select Activity ID");
@@ -100,19 +77,29 @@ public class debugClass {
             System.out.println("----------start activity-----------");
             System.out.println("enabled Aktivität ID");
             acts = executionService.getEnabledActivities(scenarioInstanceID);
-            for (ActivityInstance activityInstance: acts) {
+            for (ActivityInstance activityInstance : acts) {
                 System.out.println(activityInstance.getControlNodeInstance_id() + ", " + activityInstance.getLabel());
             }
+            Map<Integer, Map<String, String>> outputs = executionService.getOutputSetsForActivityInstance(read);
+            for (int key : outputs.keySet()) {
+                System.out.println("---OUTPUTSET " + key + " ---");
+                for (String k : outputs.get(key).keySet()) {
+                    System.out.println(k + "  " + outputs.get(key).get(k));
+                }
+                System.out.println("");
+            }
             //readLine();
+            System.out.println("Select outPutSet, -1 for nothing");
+            int read2 = new Integer(readLine());
             System.out.println("---------terminate activity------------");
-            if(!executionService.terminateActivityInstance(scenarioInstanceID, read)){
+            if (!executionService.terminateActivityInstance(scenarioInstanceID, read, read2)) {
                 System.out.println("nicht terminiert");
             }
             if (executionService.checkTerminationForScenarioInstance(scenarioInstanceID))
                 System.out.println("Scenario ist terminiert");
-            /*executionService = null;
+            executionService = null;
             executionService = new ExecutionService();
-            executionService.openExistingScenarioInstance(scenarioID, scenarioInstanceID);*/
+            executionService.openExistingScenarioInstance(scenarioID, scenarioInstanceID);
         }
 
         /*        int id = executionService.startNewScenarioInstance(new Integer(1));

@@ -1,6 +1,7 @@
 package de.uni_potsdam.hpi.bpt.bp2014.jcomparser;
 
 import de.uni_potsdam.hpi.bpt.bp2014.jcomparser.xml.Scenario;
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -13,37 +14,16 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.*;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashMap;
-import java.util.List;
-
-
-/**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
 
 /**
  * This class is the core class of the JComparser.
  * Every functionality can be used by using this class.
  */
 public class JComparser {
+    static Logger log = Logger.getLogger(JComparser.class.getName());
 
     /**
      * A main-method which should be used for Debug only.
@@ -59,7 +39,7 @@ public class JComparser {
                                                final String processServer)
             throws ParserConfigurationException, IOException, SAXException {
         Retrieval jRetrieval = new Retrieval();
-        String scenarioXML = jRetrieval.getHTMLwithAuth(processServer, pcmUrl);
+        String scenarioXML = jRetrieval.getXMLWithAuth(processServer, pcmUrl);
         InputSource is = new InputSource();
         is.setCharacterStream(new StringReader(scenarioXML));
         DocumentBuilder db = DocumentBuilderFactory
@@ -82,7 +62,7 @@ public class JComparser {
     public HashMap<String, String> getScenarioNamesAndIDs(
             final String processeditorServerUrl)
             throws XPathExpressionException {
-        String modelXML = new Retrieval().getHTMLwithAuth(
+        String modelXML = new Retrieval().getXMLWithAuth(
                 processeditorServerUrl,
                 processeditorServerUrl + "models");
         Document modelDoc = stringToDocument(modelXML);
@@ -126,7 +106,7 @@ public class JComparser {
             throws XPathExpressionException {
 
         String modelXML = new Retrieval()
-                .getHTMLwithAuth(
+                .getXMLWithAuth(
                         processeditorServerUrl,
                         processeditorServerUrl + "models");
         Document models = stringToDocument(modelXML);
@@ -143,7 +123,6 @@ public class JComparser {
                     .evaluate(models, XPathConstants.NODESET);
 
             for (int i = 0; i < xmlModelURIs.getLength(); i++) {
-                //TODO: avoid string-replacement
                 String currentXmlUri = xmlModelURIs.item(i).getTextContent();
                 String[] splittedScenarioURI = currentXmlUri.split("/");
                 String currentScenarioID =
@@ -152,7 +131,7 @@ public class JComparser {
                         "models/" + currentScenarioID + ".pm";
                 Scenario scenario = new Scenario(processeditorServerUrl);
                 String currentScenarioXML = new Retrieval()
-                        .getHTMLwithAuth(processeditorServerUrl, newScenarioURI);
+                        .getXMLWithAuth(processeditorServerUrl, newScenarioURI);
                 scenario.initializeInstanceFromXML(
                         stringToDocument(currentScenarioXML).getFirstChild());
                 scenario.save();
@@ -175,65 +154,8 @@ public class JComparser {
             doc.getDocumentElement().normalize();
             return doc;
         } catch (SAXException | IOException | ParserConfigurationException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
         return null;
     }
-
-    public void handleFileUpload(List pcm) {
-/*
-        int pcm_size = pcm.size();
-        String pcm_item = "";
-
-        List<String> pcm_list = new ArrayList<String>();
-        Object xml_path_url = pcm.get(1);
-
-        for(int i=0; i < pcm_size; i++) {
-            pcm_item = (String) pcm.get(i);
-            xml_path_url = pcm_item;
-            InputStream xml_content;
-
-            try {
-                xml_content = new FileInputStream(xml_path_url);
-                pcm_list.add(xml_content);
-            } catch (IOException e) {
-                System.out.println("Error in Reading file ");
-                System.out.println(xml_path_url);
-            }
-        }
-
-        de.uni_potsdam.hpi.bpt.bp2014.jcomparser.Parser.parsePCM(pcm);
-*/
-    }
-
-    public void handleFileRetrieval(String pcm) {
-/*
-        ArrayList<String> pcm_list = new ArrayList<String>();
-        pcm_list.add(pcm);
-
-        de.uni_potsdam.hpi.bpt.bp2014.jcomparser.Parser.parsePCM(pcm_list);
-*/
-    }
-
-    // replacing with a settings.java file
-   /* private String getServerSpecs(String path, String requestedConfig) {
-        File file = new File(path);
-        if (requestedConfig.equals("processeditorServerUrl")) {
-            try {
-                String processeditorServerUrl = (String) FileUtils.readLines(file).get(23);
-                return processeditorServerUrl;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (requestedConfig.equals("jcomparserServerUrl")) {
-            try {
-                String jcomparserServerUrl = (String) FileUtils.readLines(file).get(26);
-                return jcomparserServerUrl;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        System.err.print("ERROR within the getServerSpecs; String requestedConfig not correct defined");
-        return "";
-    }*/
 }

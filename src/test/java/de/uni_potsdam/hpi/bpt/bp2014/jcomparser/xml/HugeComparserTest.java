@@ -11,11 +11,36 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+/**
+ * ********************************************************************************
+ * <p/>
+ * _________ _______  _        _______ _________ _        _______
+ * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
+ * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
+ * |  |  | (__    |   \ | || |         | |   |   \ | || (__
+ * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
+ * |  |  | (      | | \   || | \_  )   | |   | | \   || (
+ * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
+ * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
+ * <p/>
+ * ******************************************************************
+ * <p/>
+ * Copyright © All Rights Reserved 2014 - 2015
+ * <p/>
+ * Please be aware of the License. You may found it in the root directory.
+ * <p/>
+ * **********************************************************************************
+ */
 
+/**
+ *
+ */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Scenario.class, Fragment.class, DomainModel.class})
 public class HugeComparserTest extends TestSetUp {
-
+    /**
+     *
+     */
     private class DbScenario {
         int id;
         String name;
@@ -25,6 +50,16 @@ public class HugeComparserTest extends TestSetUp {
         int datamodelversion;
         short deleted;
 
+        /**
+         *
+         * @param id
+         * @param name
+         * @param modelID
+         * @param modelversion
+         * @param datamodelID
+         * @param datamodelversion
+         * @param deleted
+         */
         public DbScenario(int id, String name, long modelID, int modelversion, long datamodelID, int datamodelversion, short deleted) {
             this.id = id;
             this.name = name;
@@ -49,6 +84,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbFragment {
         int id;
         String name;
@@ -76,6 +114,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbDataClass {
         int id;
         String name;
@@ -96,6 +137,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbDataAttribute {
         int id;
         String name;
@@ -122,6 +166,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbAggregation {
         int dataClassID1;
         int dataClassID2;
@@ -144,6 +191,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbState {
         int id;
         String name;
@@ -164,6 +214,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbDataObject {
         int id;
         String name;
@@ -190,6 +243,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbControlNode {
         int id;
         String name;
@@ -217,6 +273,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbDataNode {
         int id;
         int scenarioID;
@@ -246,6 +305,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbDataSetAndFlow {
         int dataSetID;
         // table dataflow
@@ -276,6 +338,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbControlFlow {
         int id1;
         int id2;
@@ -298,6 +363,9 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
     private class DbReference {
         int id1;
         int id2;
@@ -317,6 +385,34 @@ public class HugeComparserTest extends TestSetUp {
         }
     }
 
+    /**
+     *
+     */
+    private class DbTerminationCondition {
+        int conditionset_id;
+        int dataobject_id;
+        int state_id;
+        int scenario_id;
+
+        public DbTerminationCondition(int conditionset_id, int dataobject_id, int state_id, int scenario_id) {
+            this.conditionset_id = conditionset_id;
+            this.dataobject_id = dataobject_id;
+            this.state_id = state_id;
+            this.scenario_id = scenario_id;
+        }
+
+        @Override
+        public boolean equals (Object object) {
+            DbTerminationCondition tc = (DbTerminationCondition) object;
+            if (tc.conditionset_id == conditionset_id &&
+                    tc.dataobject_id == dataobject_id &&
+                    tc.state_id == state_id &&
+                    tc.scenario_id == scenario_id)
+                return true;
+            return false;
+        }
+    }
+
     private static java.sql.Connection conn;
     private static Statement stmt = null;
     private List<DbScenario> scenarios;
@@ -331,6 +427,7 @@ public class HugeComparserTest extends TestSetUp {
     private List<DbDataSetAndFlow> sets;
     private List<DbControlFlow> controlFlows;
     private List<DbReference> references;
+    private List<DbTerminationCondition> terminationCondition;
 
     @Before
     public void setUp() throws Exception {
@@ -363,6 +460,7 @@ public class HugeComparserTest extends TestSetUp {
         sets = new LinkedList<>();
         controlFlows = new LinkedList<>();
         references = new LinkedList<>();
+        terminationCondition = new LinkedList<>();
     }
 
     @Test
@@ -382,6 +480,11 @@ public class HugeComparserTest extends TestSetUp {
         testTerminationCondition();
 
     }
+
+    /**
+     *
+     * @throws Exception
+     */
     private void testScenario() throws Exception {
         ResultSet scenarios = getDbEntries("scenario");
         while (scenarios.next()) {
@@ -401,6 +504,10 @@ public class HugeComparserTest extends TestSetUp {
         scenarios.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testFragments() throws Exception {
         ResultSet fragments = getDbEntries("fragment");
         while (fragments.next()) {
@@ -419,6 +526,10 @@ public class HugeComparserTest extends TestSetUp {
         fragments.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testDataClass() throws Exception {
         ResultSet dataClasses = getDbEntries("dataclass");
         while (dataClasses.next()) {
@@ -430,11 +541,15 @@ public class HugeComparserTest extends TestSetUp {
             Assert.assertTrue("DataClassID smaller than 1", dataClass.id > 0);
         }
         Assert.assertTrue("DataClass not inserted correctly", this.dataClasses.values().contains(new DbDataClass(1, "DO", (short) 1)));
-        Assert.assertTrue("DataClass not inserted correctly", this.dataClasses.values().contains(new DbDataClass(2, "SubDO", (short) 0)));
+        Assert.assertTrue("DataClass not inserted correctly", this.dataClasses.values().contains(new DbDataClass(2, "SubD", (short) 0)));
         Assert.assertTrue("Too many dataClasses inserted", this.dataClasses.size() == 2);
         dataClasses.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testDataAttributes() throws Exception {
         ResultSet dataAttributes = getDbEntries("dataattribute");
         while (dataAttributes.next()) {
@@ -449,11 +564,15 @@ public class HugeComparserTest extends TestSetUp {
         }
         Assert.assertTrue("DataAttributes not inserted correctly", this.dataAttributes.contains(new DbDataAttribute(1, "Attr1", "", "", dataClasses.get("DO").id)));
         Assert.assertTrue("DataAttributes not inserted correctly", this.dataAttributes.contains(new DbDataAttribute(2, "Attr2", "", "", dataClasses.get("DO").id)));
-        Assert.assertTrue("DataAttributes not inserted correctly", this.dataAttributes.contains(new DbDataAttribute(3, "Attr3", "", "", dataClasses.get("SubDO").id)));
+        Assert.assertTrue("DataAttributes not inserted correctly", this.dataAttributes.contains(new DbDataAttribute(3, "Attr3", "", "", dataClasses.get("SubD").id)));
         Assert.assertTrue("Too many dataAttributes have been inserted", this.dataAttributes.size() == 3);
         dataAttributes.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testAggregation() throws Exception {
         ResultSet aggregations = getDbEntries("aggregation");
         while (aggregations.next()) {
@@ -463,11 +582,15 @@ public class HugeComparserTest extends TestSetUp {
                     aggregations.getInt("multiplicity"));
             this.aggregations.add(aggregation);
         }
-        Assert.assertTrue("Aggregations not inserted correctly", this.aggregations.contains(new DbAggregation(dataClasses.get("DO").id, dataClasses.get("SubDO").id, Integer.MAX_VALUE)));
+        Assert.assertTrue("Aggregations not inserted correctly", this.aggregations.contains(new DbAggregation(dataClasses.get("DO").id, dataClasses.get("SubD").id, Integer.MAX_VALUE)));
         Assert.assertTrue("Too many Aggregations have been inserted", this.aggregations.size() == 1);
         aggregations.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testStates() throws Exception {
         ResultSet states = getDbEntries("state");
         while (states.next()) {
@@ -480,12 +603,16 @@ public class HugeComparserTest extends TestSetUp {
         }
         Assert.assertTrue("State in table 'state' not inserted correctly", this.states.contains(new DbState(1, "state1", dataClasses.get("DO").id)));
         Assert.assertTrue("State in table 'state' not inserted correctly", this.states.contains(new DbState(2, "init", dataClasses.get("DO").id)));
-        Assert.assertTrue("State in table 'state' not inserted correctly", this.states.contains(new DbState(3, "end", dataClasses.get("SubDO").id)));
-        Assert.assertTrue("State in table 'state' not inserted correctly", this.states.contains(new DbState(4, "init", dataClasses.get("SubDO").id)));
+        Assert.assertTrue("State in table 'state' not inserted correctly", this.states.contains(new DbState(3, "end", dataClasses.get("SubD").id)));
+        Assert.assertTrue("State in table 'state' not inserted correctly", this.states.contains(new DbState(4, "init", dataClasses.get("SubD").id)));
         Assert.assertTrue("Too many states have been inserted", this.states.size() == 4);
         states.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testDataObjects() throws Exception {
         ResultSet dataObjects = getDbEntries("dataobject");
         while (dataObjects.next()) {
@@ -502,15 +629,19 @@ public class HugeComparserTest extends TestSetUp {
         for (DbState state : states) {
             if (state.name.equals("init") && state.dataClassID == dataClasses.get("DO").id)
                 initDO = state.id;
-            else if (state.name.equals("init") && state.dataClassID == dataClasses.get("SubDO").id)
+            else if (state.name.equals("init") && state.dataClassID == dataClasses.get("SubD").id)
                 initSubDO = state.id;
         }
-        Assert.assertTrue("DataObject in table 'dataobject' not inserted correctly", this.dataObjects.values().contains(new DbDataObject(1, "SubDO", dataClasses.get("SubDO").id, scenarios.get(0).id, initSubDO)));
+        Assert.assertTrue("DataObject in table 'dataobject' not inserted correctly", this.dataObjects.values().contains(new DbDataObject(1, "SubDO", dataClasses.get("SubD").id, scenarios.get(0).id, initSubDO)));
         Assert.assertTrue("DataObject in table 'dataobject' not inserted correctly", this.dataObjects.values().contains(new DbDataObject(2, "DO", dataClasses.get("DO").id, scenarios.get(0).id, initDO)));
         Assert.assertTrue("Too many dataObjects have been inserted", this.dataObjects.size() == 2);
         dataObjects.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testDataNodes() throws Exception {
         ResultSet dataNodes = getDbEntries("datanode");
         while (dataNodes.next()) {
@@ -528,15 +659,15 @@ public class HugeComparserTest extends TestSetUp {
         for (DbState state : states) {
             if (state.name.equals("end"))
                 endSubDO = state.id;
-            else if (state.name.equals("init") && state.dataClassID == dataClasses.get("SubDO").id)
+            else if (state.name.equals("init") && state.dataClassID == dataClasses.get("SubD").id)
                 initSubDO = state.id;
             else if (state.name.equals("init") && state.dataClassID == dataClasses.get("DO").id)
                 initDO = state.id;
             else if (state.name.equals("state1"))
                 state1DO = state.id;
         }
-        Assert.assertTrue("DataNode in table 'datanode' not inserted correctly", this.dataNodes.values().contains(new DbDataNode(1, scenarios.get(0).id, endSubDO, dataClasses.get("SubDO").id, dataObjects.get("SubDO").id, 1517694277L)));
-        Assert.assertTrue("DataNode in table 'datanode' not inserted correctly", this.dataNodes.values().contains(new DbDataNode(2, scenarios.get(0).id, initSubDO, dataClasses.get("SubDO").id, dataObjects.get("SubDO").id, 1368161079L)));
+        Assert.assertTrue("DataNode in table 'datanode' not inserted correctly", this.dataNodes.values().contains(new DbDataNode(1, scenarios.get(0).id, endSubDO, dataClasses.get("SubD").id, dataObjects.get("SubDO").id, 1517694277L)));
+        Assert.assertTrue("DataNode in table 'datanode' not inserted correctly", this.dataNodes.values().contains(new DbDataNode(2, scenarios.get(0).id, initSubDO, dataClasses.get("SubD").id, dataObjects.get("SubDO").id, 1368161079L)));
         Assert.assertTrue("DataNode in table 'datanode' not inserted correctly", this.dataNodes.values().contains(new DbDataNode(3, scenarios.get(0).id, state1DO, dataClasses.get("DO").id, dataObjects.get("DO").id, 650069438L)));
         Assert.assertTrue("DataNode in table 'datanode' not inserted correctly", this.dataNodes.values().contains(new DbDataNode(4, scenarios.get(0).id, initDO, dataClasses.get("DO").id, dataObjects.get("DO").id, 135409402L)));
         Assert.assertTrue("DataNode in table 'datanode' not inserted correctly", this.dataNodes.values().contains(new DbDataNode(5, scenarios.get(0).id, initDO, dataClasses.get("DO").id, dataObjects.get("DO").id, 155099451L)));
@@ -545,6 +676,10 @@ public class HugeComparserTest extends TestSetUp {
         dataNodes.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testControlNodes() throws Exception {
         ResultSet controlNodes = getDbEntries("controlnode");
         while (controlNodes.next()) {
@@ -566,7 +701,7 @@ public class HugeComparserTest extends TestSetUp {
         }
         Assert.assertTrue("ControlNode in table 'controlnode' not inserted correctly", this.controlNodes.values().contains(new DbControlNode(1, "", "Startevent", fragments.get("FragmentA").id, 1069345757L)));
         Assert.assertTrue("ControlNode in table 'controlnode' not inserted correctly", this.controlNodes.values().contains(new DbControlNode(2, "Ref", "Activity", fragments.get("FragmentA").id, 8267903230L)));
-        Assert.assertTrue("ControlNode in table 'controlnode' not inserted correctly", this.controlNodes.values().contains(new DbControlNode(3, "A1", "Activity", fragments.get("FragmentA").id, 517729148L)));
+        Assert.assertTrue("ControlNode in table 'controlnode' not inserted correctly", this.controlNodes.values().contains(new DbControlNode(3, "A1", "WebServiceTask", fragments.get("FragmentA").id, 517729148L)));
         Assert.assertTrue("ControlNode in table 'controlnode' not inserted correctly", this.controlNodes.values().contains(new DbControlNode(4, "", "AND", fragments.get("FragmentA").id, 1569336784L)));
         Assert.assertTrue("ControlNode in table 'controlnode' not inserted correctly", this.controlNodes.values().contains(new DbControlNode(5, "", "AND", fragments.get("FragmentA").id, 2081480666L)));
         Assert.assertTrue("ControlNode in table 'controlnode' not inserted correctly", this.controlNodes.values().contains(new DbControlNode(6, "", "Endevent", fragments.get("FragmentA").id, 1914825610L)));
@@ -581,6 +716,10 @@ public class HugeComparserTest extends TestSetUp {
         controlNodes.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testDataSetAndDataFlow() throws Exception {
         ResultSet dataSets = getDataSetJoins();
         while (dataSets.next()) {
@@ -604,6 +743,10 @@ public class HugeComparserTest extends TestSetUp {
         dataSets.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testControlFlow() throws Exception {
         ResultSet controlFlows = getDbEntries("controlflow");
         while (controlFlows.next()) {
@@ -630,6 +773,10 @@ public class HugeComparserTest extends TestSetUp {
         controlFlows.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testReferences() throws Exception {
         ResultSet references = getDbEntries("reference");
         while (references.next()) {
@@ -644,22 +791,41 @@ public class HugeComparserTest extends TestSetUp {
         references.close();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     private void testTerminationCondition() throws Exception {
         ResultSet terminationCondition = getDbEntries("terminationcondition");
-        terminationCondition.next();
-        DbState terminatingState = null;
-        for (DbState state : states) {
-            if (state.name.equals("end"))
-                terminatingState = state;
+        while (terminationCondition.next()) {
+            DbTerminationCondition tc = new DbTerminationCondition(
+                    terminationCondition.getInt("conditionset_id"),
+                    terminationCondition.getInt("dataobject_id"),
+                    terminationCondition.getInt("state_id"),
+                    terminationCondition.getInt("scenario_id"));
+            this.terminationCondition.add(tc);
         }
-        Assert.assertEquals("ConditionsetID in table 'terminationcondition' not inserted correctly", 1, terminationCondition.getInt("conditionset_id"));
-        Assert.assertEquals("DataobjectID in table 'terminationcondition' not inserted correctly", dataObjects.get("SubDO").id, terminationCondition.getInt("dataobject_id"));
-        Assert.assertEquals("StateID in table 'terminationcondition' not inserted correctly", terminatingState.id, terminationCondition.getInt("state_id"));
-        Assert.assertEquals("ScenarioID in table 'terminationcondition' not inserted correctly", scenarios.get(0).id, terminationCondition.getInt("scenario_id"));
-        Assert.assertFalse("Too many entries in table 'terminationcondition'", terminationCondition.next());
+        int end = 0, state1 = 0, initSubDO = 0;
+        for (DbState state : states) {
+            if (state.name.equals("init") && state.dataClassID == dataClasses.get("SubD").id)
+                initSubDO = state.id;
+            else if (state.name.equals("end") && state.dataClassID == dataClasses.get("SubD").id)
+                end = state.id;
+            else if (state.name.equals("state1") && state.dataClassID == dataClasses.get("DO").id)
+                state1 = state.id;
+        }
+        Assert.assertEquals("TerminationCondition is not set correctly", 3, this.terminationCondition.size());
+        Assert.assertTrue("TerminationCondition is not set correctly", this.terminationCondition.contains(new DbTerminationCondition(1, dataObjects.get("SubDO").id, end, scenarios.get(0).id)));Assert.assertTrue("TerminationCondition is not set correctly", this.terminationCondition.contains(new DbTerminationCondition(1, dataObjects.get("DO").id, state1, scenarios.get(0).id)));
+        Assert.assertTrue("TerminationCondition is not set correctly", this.terminationCondition.contains(new DbTerminationCondition(1, dataObjects.get("SubDO").id, end, scenarios.get(0).id)));Assert.assertTrue("TerminationCondition is not set correctly", this.terminationCondition.contains(new DbTerminationCondition(1, dataObjects.get("SubDO").id, end, scenarios.get(0).id)));
+        Assert.assertTrue("TerminationCondition is not set correctly", this.terminationCondition.contains(new DbTerminationCondition(1, dataObjects.get("SubDO").id, end, scenarios.get(0).id)));Assert.assertTrue("TerminationCondition is not set correctly", this.terminationCondition.contains(new DbTerminationCondition(2, dataObjects.get("SubDO").id, initSubDO, scenarios.get(0).id)));
         terminationCondition.close();
     }
 
+    /**
+     *
+     * @param tablename
+     * @return
+     */
     private ResultSet getDbEntries (String tablename) {
         String select = "SELECT * " +
                 "FROM " + tablename;
@@ -679,6 +845,10 @@ public class HugeComparserTest extends TestSetUp {
         return rs;
     }
 
+    /**
+     *
+     * @return
+     */
     private ResultSet getDataSetJoins () {
         String select = "SELECT * " +
                 "FROM dataflow, dataset, datasetconsistsofdatanode " +

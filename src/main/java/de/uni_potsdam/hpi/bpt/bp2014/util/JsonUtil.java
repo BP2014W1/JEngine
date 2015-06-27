@@ -1,7 +1,7 @@
 package de.uni_potsdam.hpi.bpt.bp2014.util;
 
 import com.google.gson.Gson;
-import com.google.gson.*;
+import com.google.gson.JsonObject;
 import org.json.JSONArray;
 
 import java.util.*;
@@ -13,11 +13,10 @@ import java.util.*;
 public class JsonUtil {
 
     /**
-     *
      * @param content is an ArrayList<HashMap<String,Object>>
-     * @return
+     * @return JSON Object as String
      */
-    public static String JsonWrapperArrayListHashMap(ArrayList<HashMap<String,Object>> content) {
+    public static String JsonWrapperArrayListHashMap(ArrayList<HashMap<String, Object>> content) {
         Gson gson = new Gson();
         JSONArray json = new JSONArray(content);
         return gson.toJson(json);
@@ -33,9 +32,32 @@ public class JsonUtil {
         return gson.toJson(json);
     }
 
+    /**
+     *
+     * @param content
+     * @return
+     */
+    public static String JsonWrapperObject(Object content) {
+        Gson gson = new Gson();
+        JsonObject json = new JsonObject();
+        return gson.toJson(json);
+    }
+
+    /**
+     *
+     */
     public static String JsonWrapperCollection(Collection content) {
         Gson gson = new Gson();
         String json = gson.toJson(content);
+        return gson.toJson(json);
+    }
+
+    /**
+     * This class is a JSON containing a String.
+     */
+    public static String JsonWrapperString(String value) {
+        Gson gson = new Gson();
+        JsonString json = new JsonString(value);
         return gson.toJson(json);
     }
 
@@ -51,6 +73,16 @@ public class JsonUtil {
     }
 
     /**
+     *
+     * @param content
+     * @return
+     */
+    public static String JsonWrapperHashMapOnly(HashMap content) {
+        Gson gson = new Gson();
+        return gson.toJson(content);
+    }
+
+    /**
      * @param content contains a LinkedList
      * @param labels  contains a String
      * @param states  contains a String
@@ -61,6 +93,7 @@ public class JsonUtil {
         JsonHashMapMultipleIntegerString json = new JsonHashMapMultipleIntegerString(content, labels, states);
         return gson.toJson(json);
     }
+
     /**
      * This class is a JSON HashMap containing a List of ID's and a HashMap consisting of the given ID's and labels as Strings.
      */
@@ -71,7 +104,7 @@ public class JsonUtil {
         /**
          * constructor.
          *
-         * @param ids This are the database ID's for the given Objects in the HashMap.
+         * @param ids    This are the database ID's for the given Objects in the HashMap.
          * @param labels This is a HashMap of database ID's and the corresponding labels as a String.
          */
         public JsonHashMapIntegerString(LinkedList<Integer> ids, HashMap<Integer, String> labels) {
@@ -80,6 +113,9 @@ public class JsonUtil {
         }
     }
 
+    /**
+     * This class is a JSON Multi (!) HashMap containing a List of ID's and a HashMap consisting of the given ID's and labels as Strings.
+     */
     public static class JsonHashMapMultipleIntegerString {
         private HashMap<Integer, String> states;
         private LinkedList<Integer> ids;
@@ -91,6 +127,7 @@ public class JsonUtil {
             this.states = states;
         }
     }
+
     /**
      * This class handles the JSON representation of a list filled with database ID's.
      */
@@ -124,6 +161,22 @@ public class JsonUtil {
     }
 
     /**
+     * This class is the representation of a String as JSON.
+     */
+    public static class JsonString {
+        private String value;
+
+        /**
+         * constructor.
+         *
+         * @param value String Value.
+         */
+        public JsonString(String value) {
+            this.value = value;
+        }
+    }
+
+    /**
      * This class is the representation of a HashMap that maps a String to a String.
      */
     public static class JsonStringHashMap {
@@ -140,7 +193,6 @@ public class JsonUtil {
     }
 
     /**
-     *
      * @param jsonLine
      * @return parsed json string
      */
@@ -148,14 +200,5 @@ public class JsonUtil {
         Map jsonJavaRootObject = new Gson().fromJson(jsonLine, Map.class);
         return jsonJavaRootObject;
 
-        /*
-        JsonElement jelement = new JsonParser().parse(jsonLine);
-        JsonObject  jobject = jelement.getAsJsonObject();
-        jobject = jobject.getAsJsonObject("data");
-        JsonArray jarray = jobject.getAsJsonArray("translations");
-        jobject = jarray.get(0).getAsJsonObject();
-        String result = jobject.get("translatedText").toString();
-        return result;
-        */
     }
 }

@@ -1,15 +1,15 @@
 package de.uni_potsdam.hpi.bpt.bp2014.database;
 
 /**
- * Created by jaspar.mang on 14.01.15.
+ *
  */
 
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbGatewayInstance;
+import de.uni_potsdam.hpi.bpt.bp2014.AbstractDatabaseDependentTest;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class DbGatewayInstanceTest {
+public class DbGatewayInstanceTest extends AbstractDatabaseDependentTest {
     @Test
     public void testGetType(){
         DbGatewayInstance gatewayInstance = new DbGatewayInstance();

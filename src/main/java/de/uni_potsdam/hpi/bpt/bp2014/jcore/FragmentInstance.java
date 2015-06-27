@@ -9,28 +9,6 @@ import java.util.LinkedList;
 
 
 /**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
-
-
-/**
  * Represents a fragment instance.
  */
 public class FragmentInstance {
@@ -77,13 +55,15 @@ public class FragmentInstance {
     private void initializeExistingNodeInstanceForFragment() {
         //initializes all Activity Instances in the database
         LinkedList<Integer> activities = dbControlNodeInstance.getActivitiesForFragmentInstanceID(fragmentInstance_id);
-        for (int activity : activities) {
-            ActivityInstance activityInstance = new ActivityInstance(activity, fragmentInstance_id, scenarioInstance);
+        LinkedList<Integer> activityInstances = dbControlNodeInstance.getActivityInstancesForFragmentInstanceID(fragmentInstance_id);
+        for (int i = 0; activities.size() > i; i++) {
+            new ActivityInstance(activities.get(i), fragmentInstance_id, scenarioInstance, activityInstances.get(i));
         }
         //initializes all Gateway Instances in the database
         LinkedList<Integer> gateways = dbControlNodeInstance.getGatewaysForFragmentInstanceID(fragmentInstance_id);
-        for (int gateway : gateways) {
-            GatewayInstance gatewayInstance = new GatewayInstance(gateway, fragmentInstance_id, scenarioInstance);
+        LinkedList<Integer> gatewayInstances = dbControlNodeInstance.getGatewayInstancesForFragmentInstanceID(fragmentInstance_id);
+        for (int i = 0; gateways.size() > i; i++) {
+            new GatewayInstance(gateways.get(i), fragmentInstance_id, scenarioInstance, gatewayInstances.get(i));
         }
     }
 
@@ -96,14 +76,19 @@ public class FragmentInstance {
         int startEvent = dbControlNode.getStartEventID(fragment_id);
         int controlNode = dbControlFlow.getNextControlNodeAfterStartEvent(startEvent);
         String controlNodeType = dbControlNode.getType(controlNode);
-        //TODO: type
-        if (controlNodeType.equals("Activity") || controlNodeType.equals("EmailTask")) {
-            ActivityInstance activityInstance = new ActivityInstance(controlNode, fragmentInstance_id, scenarioInstance);
-            activityInstance.incomingBehavior.enableControlFlow();
-        } else if (controlNodeType.equals("AND") || controlNodeType.equals("XOR")) {
-            GatewayInstance gatewayInstance = new GatewayInstance(controlNode, fragmentInstance_id, scenarioInstance);
-            gatewayInstance.incomingBehavior.enableControlFlow();
+        ControlNodeInstance controlNodeInstance = null;
+        switch (controlNodeType) {
+            case "Activity":
+            case "EmailTask":
+            case "WebServiceTask":
+                controlNodeInstance = new ActivityInstance(controlNode, fragmentInstance_id, scenarioInstance);
+                break;
+            case "AND":
+            case "XOR":
+                controlNodeInstance = new GatewayInstance(controlNode, fragmentInstance_id, scenarioInstance);
+                break;
         }
+        controlNodeInstance.enableControlFlow();
     }
 
     /**
@@ -113,22 +98,32 @@ public class FragmentInstance {
         dbFragmentInstance.terminateFragmentInstance(fragmentInstance_id);
     }
 
-    /*
-     * Getter
-     */
+    // ****************************** Getter **********************************
 
+    /**
+     * @return
+     */
     public ScenarioInstance getScenarioInstance() {
         return scenarioInstance;
     }
 
+    /**
+     * @return
+     */
     public int getFragment_id() {
         return fragment_id;
     }
 
+    /**
+     * @return
+     */
     public int getFragmentInstance_id() {
         return fragmentInstance_id;
     }
 
+    /**
+     * @return
+     */
     public int getScenarioInstance_id() {
         return scenarioInstance_id;
     }

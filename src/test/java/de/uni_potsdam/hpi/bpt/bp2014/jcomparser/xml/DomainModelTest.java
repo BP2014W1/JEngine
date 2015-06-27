@@ -17,12 +17,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 
+
 /**
- * Created by Ihdefix on 12.03.2015.
+ *
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DomainModel.class})
-public class DomainModelTest {
+public class DomainModelTest  {
     /**
      * This Method fetches the version from the PE-Server.
      */
@@ -112,6 +113,7 @@ public class DomainModelTest {
             e.printStackTrace();
         }
     }
+
     /**
      * This method checks if the version has been set correctly.
      */

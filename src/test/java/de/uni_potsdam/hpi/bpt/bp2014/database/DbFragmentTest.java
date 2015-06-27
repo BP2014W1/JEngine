@@ -1,14 +1,14 @@
 package de.uni_potsdam.hpi.bpt.bp2014.database;
 
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbFragment;
+import de.uni_potsdam.hpi.bpt.bp2014.AbstractDatabaseDependentTest;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 /**
- * Created by jaspar.mang on 12.01.15.
+ *
  */
-public class DbFragmentTest {
+public class DbFragmentTest extends AbstractDatabaseDependentTest {
     @Test
     public void testGetFragmentsForScenario(){
         DbFragment dbFragment = new DbFragment();

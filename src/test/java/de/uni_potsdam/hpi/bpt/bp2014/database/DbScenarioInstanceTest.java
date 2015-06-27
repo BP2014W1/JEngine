@@ -1,14 +1,20 @@
 package de.uni_potsdam.hpi.bpt.bp2014.database;
 
 
-import static org.junit.Assert.*;
+import de.uni_potsdam.hpi.bpt.bp2014.AbstractDatabaseDependentTest;
 import org.junit.Test;
+
 import java.util.LinkedList;
 
+import static org.junit.Assert.*;
+
 /**
- * Created by jaspar.mang on 12.01.15.
+ *
  */
-public class DbScenarioInstanceTest {
+public class DbScenarioInstanceTest extends AbstractDatabaseDependentTest {
+    /**
+     *
+     */
     @Test
     public void testExistScenario(){
         DbScenarioInstance dbScenarioInstance = new DbScenarioInstance();
@@ -18,12 +24,18 @@ public class DbScenarioInstanceTest {
         assertFalse(dbScenarioInstance.existScenario(1, 999));
     }
 
+    /**
+     *
+     */
     @Test
     public void testGetScenarioInstanceID(){
         DbScenarioInstance dbScenarioInstance = new DbScenarioInstance();
         assertEquals(86, dbScenarioInstance.getScenarioInstanceID(100));
     }
 
+    /**
+     *
+     */
     @Test
     public void testGetScenarioInstances(){
         DbScenarioInstance dbScenarioInstance = new DbScenarioInstance();
@@ -32,6 +44,9 @@ public class DbScenarioInstanceTest {
         assertEquals(86, (int)instances.get(1));
     }
 
+    /**
+     *
+     */
     @Test
     public void testCreateNewScenarioInstance(){
         DbScenarioInstance dbScenarioInstance = new DbScenarioInstance();

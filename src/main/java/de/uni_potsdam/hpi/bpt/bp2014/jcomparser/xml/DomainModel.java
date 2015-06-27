@@ -2,8 +2,10 @@ package de.uni_potsdam.hpi.bpt.bp2014.jcomparser.xml;
 
 import de.uni_potsdam.hpi.bpt.bp2014.jcomparser.Connector;
 import de.uni_potsdam.hpi.bpt.bp2014.jcomparser.Retrieval;
-import org.w3c.dom.*;
-import org.w3c.dom.Node;
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -21,10 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Ihdefix on 04.03.2015.
- */
 public class DomainModel implements IDeserialisable, IPersistable {
+    static Logger log = Logger.getLogger(DomainModel.class.getName());
+
     /**
      * The url of the process Editor.
      */
@@ -44,7 +45,7 @@ public class DomainModel implements IDeserialisable, IPersistable {
     /**
      * A Mao of modelID's and corresponding dataClasses belonging to this domainModel.
      */
-    private Map<Long,DataClass> dataClasses;
+    private Map<Long, DataClass> dataClasses;
     /**
      * A List of all aggregation between the dataClasses belonging to this domainModel.
      */
@@ -66,7 +67,7 @@ public class DomainModel implements IDeserialisable, IPersistable {
     /**
      * The constructor.
      */
-    public DomainModel(){
+    public DomainModel() {
 
     }
 
@@ -113,7 +114,7 @@ public class DomainModel implements IDeserialisable, IPersistable {
                 this.aggregations.add(currentAggregation);
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
     }
 
@@ -136,7 +137,7 @@ public class DomainModel implements IDeserialisable, IPersistable {
                 this.dataClasses.put(currentClass.getDataClassModelID(), currentClass);
             }
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
     }
 
@@ -151,7 +152,7 @@ public class DomainModel implements IDeserialisable, IPersistable {
                     .compile(xPathQuery)
                     .evaluate(this.domainModelXML));
         } catch (XPathExpressionException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
     }
 
@@ -167,7 +168,6 @@ public class DomainModel implements IDeserialisable, IPersistable {
                 NodeList versions = (NodeList) xPath.compile(xPathQuery).evaluate(versionXML, XPathConstants.NODESET);
                 int maxID = 0;
                 // We assume that the version that needs to be saved is the newest one
-                //TODO: Do we want to save versions that are currently not in the Database?
                 for (int i = 0; i < versions.getLength(); i++) {
                     xPathQuery = "@id";
                     int currentID = Integer.parseInt((String) xPath.compile(xPathQuery).evaluate(versions.item(i), XPathConstants.STRING));
@@ -176,7 +176,7 @@ public class DomainModel implements IDeserialisable, IPersistable {
                 }
                 versionNumber = maxID;
             } catch (XPathExpressionException e) {
-                e.printStackTrace();
+                log.error("Error:", e);
             }
         }
     }
@@ -189,7 +189,7 @@ public class DomainModel implements IDeserialisable, IPersistable {
     private Element fetchVersionXML() {
         try {
             Retrieval jRetrieval = new Retrieval();
-            String versionXML = jRetrieval.getHTMLwithAuth(
+            String versionXML = jRetrieval.getXMLWithAuth(
                     processeditorServerUrl,
                     processeditorServerUrl + "models/" + domainModelModelID + "/versions");
             InputSource is = new InputSource();
@@ -201,7 +201,7 @@ public class DomainModel implements IDeserialisable, IPersistable {
             Document doc = db.parse(is);
             return doc.getDocumentElement();
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+            log.error("Error:", e);
         }
         return null;
     }
@@ -219,7 +219,7 @@ public class DomainModel implements IDeserialisable, IPersistable {
                 this.versionNumber,
                 this.scenarioID
         );
-        for (DataClass dataClass : dataClasses.values()){
+        for (DataClass dataClass : dataClasses.values()) {
             dataClass.save();
         }
         for (Aggregation aggregation : aggregations) {

@@ -31,9 +31,9 @@ public class Ausprobieren {
             SAXException {
 
         Retrieval jRetrieval = new Retrieval();
-        String scenarioXML = jRetrieval.getHTMLwithAuth(
+        String scenarioXML = jRetrieval.getXMLWithAuth(
                 "http://bp2014w1-dev:1205/",
-                "http://bp2014w1-dev:1205/models/1306393364.pm");
+                "http://bp2014w1-dev:1205/models/1225104276.pm");
 
         InputSource is = new InputSource();
         is.setCharacterStream(new StringReader(scenarioXML));

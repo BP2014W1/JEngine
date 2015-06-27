@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  */
 public class RestInterfaceTest extends AbstractTest {
 
-    private static final String DEVELOPMENT_SQL_SEED_FILE = "src/main/resources/JEngineV2.sql";
+    private static final String DEVELOPMENT_SQL_SEED_FILE = "src/main/resources/JEngineV2_schema.sql";
     /**
      * Sets up the seed file for the test database.
      */
@@ -97,7 +97,7 @@ public class RestInterfaceTest extends AbstractTest {
     public void testGetScenarioContent() {
         Response response = base.path("scenario").request().get();
         assertThat("Get Scenarios did not contain the expected information",
-                "{\"ids\":[1,2,3,100,101,103,105,111,113,114,115,116,117,118,134,135,136,138,139,140,141,142,143,144],\"links\":{\"140\":\"http://localhost:9998/interface/v2/scenario/140\",\"141\":\"http://localhost:9998/interface/v2/scenario/141\",\"142\":\"http://localhost:9998/interface/v2/scenario/142\",\"143\":\"http://localhost:9998/interface/v2/scenario/143\",\"1\":\"http://localhost:9998/interface/v2/scenario/1\",\"100\":\"http://localhost:9998/interface/v2/scenario/100\",\"111\":\"http://localhost:9998/interface/v2/scenario/111\",\"144\":\"http://localhost:9998/interface/v2/scenario/144\",\"2\":\"http://localhost:9998/interface/v2/scenario/2\",\"101\":\"http://localhost:9998/interface/v2/scenario/101\",\"134\":\"http://localhost:9998/interface/v2/scenario/134\",\"3\":\"http://localhost:9998/interface/v2/scenario/3\",\"113\":\"http://localhost:9998/interface/v2/scenario/113\",\"135\":\"http://localhost:9998/interface/v2/scenario/135\",\"103\":\"http://localhost:9998/interface/v2/scenario/103\",\"114\":\"http://localhost:9998/interface/v2/scenario/114\",\"136\":\"http://localhost:9998/interface/v2/scenario/136\",\"115\":\"http://localhost:9998/interface/v2/scenario/115\",\"105\":\"http://localhost:9998/interface/v2/scenario/105\",\"116\":\"http://localhost:9998/interface/v2/scenario/116\",\"138\":\"http://localhost:9998/interface/v2/scenario/138\",\"117\":\"http://localhost:9998/interface/v2/scenario/117\",\"139\":\"http://localhost:9998/interface/v2/scenario/139\",\"118\":\"http://localhost:9998/interface/v2/scenario/118\"},\"labels\":{\"1\":\"HELLOWORLD\",\"2\":\"helloWorld2\",\"3\":\"EmailTest\",\"100\":\"TestScenario\",\"101\":\"Test Insert Scenario\",\"134\":\"ReiseTestScenario\",\"103\":\"ScenarioTest1\",\"135\":\"ReiseTestScenario\",\"136\":\"TXOR1Scenario\",\"105\":\"TestScenarioTerminationCondition\",\"138\":\"TestEmail1Scenario\",\"139\":\"TestEmail1Scenario\",\"140\":\"TestEmail1Scenario\",\"141\":\"TestEmail2Scenario\",\"142\":\"TestEmail3Scenario\",\"111\":\"Test2_2ReferenceTest\",\"143\":\"TestEmail3Scenario\",\"144\":\"XORTest2Scenario\",\"113\":\"referencetest3_2\",\"114\":\"RT4Scenario\",\"115\":\"TT2Scenario\",\"116\":\"TT2Scenario\",\"117\":\"AT2Scenario\",\"118\":\"AT3Scenario\"}}",
+                "{\"ids\":[1,2,3,100,101,103,105,111,113,114,115,116,117,118,134,135,136,138,139,140,141,142,143,144, 145],\"links\":{\"140\":\"http://localhost:9998/interface/v2/scenario/140\",\"141\":\"http://localhost:9998/interface/v2/scenario/141\",\"142\":\"http://localhost:9998/interface/v2/scenario/142\",\"143\":\"http://localhost:9998/interface/v2/scenario/143\",\"1\":\"http://localhost:9998/interface/v2/scenario/1\",\"100\":\"http://localhost:9998/interface/v2/scenario/100\",\"111\":\"http://localhost:9998/interface/v2/scenario/111\",\"144\":\"http://localhost:9998/interface/v2/scenario/144\",\"2\":\"http://localhost:9998/interface/v2/scenario/2\",\"101\":\"http://localhost:9998/interface/v2/scenario/101\",\"134\":\"http://localhost:9998/interface/v2/scenario/134\",\"3\":\"http://localhost:9998/interface/v2/scenario/3\",\"113\":\"http://localhost:9998/interface/v2/scenario/113\",\"135\":\"http://localhost:9998/interface/v2/scenario/135\",\"103\":\"http://localhost:9998/interface/v2/scenario/103\",\"114\":\"http://localhost:9998/interface/v2/scenario/114\",\"136\":\"http://localhost:9998/interface/v2/scenario/136\",\"115\":\"http://localhost:9998/interface/v2/scenario/115\",\"105\":\"http://localhost:9998/interface/v2/scenario/105\",\"116\":\"http://localhost:9998/interface/v2/scenario/116\",\"138\":\"http://localhost:9998/interface/v2/scenario/138\",\"117\":\"http://localhost:9998/interface/v2/scenario/117\",\"139\":\"http://localhost:9998/interface/v2/scenario/139\",\"118\":\"http://localhost:9998/interface/v2/scenario/118\",\"145\":\"http://localhost:9998/interface/v2/scenario/145\"},\"labels\":{\"1\":\"HELLOWORLD\",\"2\":\"helloWorld2\",\"3\":\"EmailTest\",\"100\":\"TestScenario\",\"101\":\"Test Insert Scenario\",\"134\":\"ReiseTestScenario\",\"103\":\"ScenarioTest1\",\"135\":\"ReiseTestScenario\",\"136\":\"TXOR1Scenario\",\"105\":\"TestScenarioTerminationCondition\",\"138\":\"TestEmail1Scenario\",\"139\":\"TestEmail1Scenario\",\"140\":\"TestEmail1Scenario\",\"141\":\"TestEmail2Scenario\",\"142\":\"TestEmail3Scenario\",\"111\":\"Test2_2ReferenceTest\",\"143\":\"TestEmail3Scenario\",\"144\":\"XORTest2Scenario\",\"113\":\"referencetest3_2\",\"114\":\"RT4Scenario\",\"115\":\"TT2Scenario\",\"116\":\"TT2Scenario\",\"117\":\"AT2Scenario\",\"118\":\"AT3Scenario\",\"145\":\"ServiceTaskSzenario\"}}",
                 jsonEquals(response.readEntity(String.class)).when(Option.IGNORING_ARRAY_ORDER));
     }
 
@@ -559,7 +559,7 @@ public class RestInterfaceTest extends AbstractTest {
         assertThat("The returned JSON does not contain the expected content",
                 "{\"ids\":[1,2],\"results\":{\"1\":{\"link\":\"http://localhost:9998/interface/v2/scenario/1/instance/72/dataobject/1\",\"id\":1,\"label\":\"object1\",\"state\":\"init\"},\"2\":{\"link\":\"http://localhost:9998/interface/v2/scenario/1/instance/72/dataobject/2\",\"id\":2,\"label\":\"object2\",\"state\":\"init\"}}}",
                 jsonEquals(response.readEntity(String.class))
-                        .when(Option.IGNORING_ARRAY_ORDER));
+                        .when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_EXTRA_FIELDS));
     }
 
     /**
@@ -630,9 +630,10 @@ public class RestInterfaceTest extends AbstractTest {
         assertEquals("getDataObject return a Response with the wrong media Type",
                 MediaType.APPLICATION_JSON, response.getMediaType().toString());
         assertThat("The returned JSON does not contain the expected content",
-                "{\"label\":\"object1\",\"id\":1,\"state\":\"init\"}",
+                "{\"label\":\"object1\",\"set_id\":0,\"id\":1,\"state\":\"init\"}",
                 jsonEquals(response.readEntity(String.class))
-                        .when(Option.IGNORING_ARRAY_ORDER));
+                        .when(Option.IGNORING_ARRAY_ORDER)
+                        .when(Option.IGNORING_EXTRA_FIELDS));
     }
 
     /**
@@ -684,9 +685,11 @@ public class RestInterfaceTest extends AbstractTest {
         assertEquals("getDataObject return a Response with the wrong media Type",
                 MediaType.APPLICATION_JSON, response.getMediaType().toString());
         assertThat("The returned JSON does not contain the expected content",
-                "{\"label\":\"object1\",\"id\":1,\"state\":\"init\"}",
+                "{\"label\":\"object1\",\"set_id\":0,\"id\":1,\"state\":\"init\"}",
                 jsonEquals(response.readEntity(String.class))
-                        .when(Option.IGNORING_ARRAY_ORDER));
+                        .when(Option.IGNORING_ARRAY_ORDER)
+                        .when(Option.IGNORING_EXTRA_FIELDS));
+        ;
     }
 
 
@@ -728,6 +731,9 @@ public class RestInterfaceTest extends AbstractTest {
 
     /**
      * When you send a Get to {@link RestInterface#getActivity(UriInfo, int, int, int)}
+     * with valid arguments
+     * then you should get a 200 response code and
+     * a JSONObject with the id, label of the activity and a link to the outputSet and the inputSet.
      */
     @Test
     public void testGetActivity(){
@@ -736,14 +742,17 @@ public class RestInterfaceTest extends AbstractTest {
         assertEquals("Get Activity does not return a JSON", MediaType.APPLICATION_JSON,
                 response.getMediaType().toString());
         assertThat("The returned JSON does not contain the expected content",
-                "{\"id\":4517,\"label\":\"Reiseplanung beginnen\",\"outputSet\":{\"linkDataObject\":\"http://localhost:9998/interface/v2/scenario/135/instance/808/activity/4517/output\"},\"inputSet\":{\"linkDataObject\":\"http://localhost:9998/interface/v2/scenario/135/instance/808/activity/4517/input\"}}",
+                "{\"id\":4517,\"label\":\"Reiseplanung beginnen\",\"outputSetLink\":\"http://localhost:9998/interface/v2/scenario/135/instance/808/activity/4517/output\",\"inputSetLink\":\"http://localhost:9998/interface/v2/scenario/135/instance/808/activity/4517/input\"}",
                 jsonEquals(response.readEntity(String.class))
                         .when(Option.IGNORING_ARRAY_ORDER));
     }
 
     /**
-     * When you send a Get to {@link RestInterface#getInputDataObjects(int, int, int)}
-     *//*
+     * When you send a Get to {@link RestInterface#getInputDataObjects(UriInfo, int, int, int)}
+     * with valid arguments
+     * then you then you should get a 200 response code and a JSONObject with the id of the inputSet and
+     * a link to get the dataObjectInstance with their dataAttributeInstance.
+     */
     @Test
     public void testGetInputDataObjects(){
         Response response = base.path("scenario/135/instance/808/activity/4518/input").request().get();
@@ -751,13 +760,16 @@ public class RestInterfaceTest extends AbstractTest {
         assertEquals("GetInputDataObjects does not return a JSON", MediaType.APPLICATION_JSON,
                 response.getMediaType().toString());
         assertThat("The returned JSON does not contain the expected content",
-                "[{\"label\":\"Reiseplan\",\"id\":22,\"state\":\"init\",\"attributeConfiguration\":{\"entry\":[{\"key\":1,\"value\":\"{name=Preis, type=, value=250€}\"}]}}]",
+                "[{\"id\":139,\"linkDataObject\":\"http://localhost:9998/interface/v2/scenario/135/instance/808/inputset/139\"}]",
                 jsonEquals(response.readEntity(String.class)).when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_VALUES));
     }
 
     /**
-     * When you send a Get to {@link RestInterface#getOutputDataObjects(int, int, int)}
-     *//*
+     * When you send a Get to {@link RestInterface#getOutputDataObjects(UriInfo, int, int, int)}
+     * with valid arguments
+     * then you then you should get a 200 response code and a JSONObject with the id of the outputSet and
+     * a link to get the dataObjectInstance with their dataAttributeInstance.
+     */
     @Test
     public void testGetOutputDataObjects(){
         Response response = base.path("scenario/135/instance/808/activity/4518/output").request().get();
@@ -765,18 +777,18 @@ public class RestInterfaceTest extends AbstractTest {
         assertEquals("GetOutputDataObjects does not return a JSON", MediaType.APPLICATION_JSON,
                 response.getMediaType().toString());
         assertThat("The returned JSON does not contain the expected content",
-                "[{\"label\":\"Reiseplan\",\"id\":22,\"state\":\"init\",\"attributeConfiguration\":{\"entry\":[{\"key\":1,\"value\":\"{name=Preis, type=, value=250€}\"}]}}]",
+                "[{\"id\":140,\"linkDataObject\":\"http://localhost:9998/interface/v2/scenario/135/instance/808/outputset/140\"}]",
                 jsonEquals(response.readEntity(String.class)).when(Option.IGNORING_ARRAY_ORDER).when(Option.COMPARING_ONLY_STRUCTURE));
     }
     /**
-     * When you send a Get to {@link RestInterface#updateActivityState(int, int, int, String, String)}
+     * When you send a Get to {@link RestInterface#updateActivityState(int, int, int, String)}
      * with an invalid state
      * a bad request with an error message should be returned.
      */
     @Test
     public void testInvalidStateUpdateActivity() {
         Response response = base.path("scenario/1/instance/72/activity/105")
-                .queryParam("state", "complete").request().put(Entity.json("[]"));
+                .queryParam("state", "complete").request().post(Entity.json("[]"));
         assertEquals("The Response code of getTerminationCondition was not 400",
                 400, response.getStatus());
         assertEquals("Get TerminationCondition does not return a JSON",
@@ -793,7 +805,7 @@ public class RestInterfaceTest extends AbstractTest {
     @Test
     public void testInvalidStateUpdateActivity2() {
         Response response = base.path("scenario/1/instance/72/activity/105")
-                .request().put(Entity.json("[]"));
+                .request().post(Entity.json("[]"));
         assertEquals("The Response code of getTerminationCondition was not 400",
                 400, response.getStatus());
         assertEquals("Get TerminationCondition does not return a JSON",
@@ -806,14 +818,14 @@ public class RestInterfaceTest extends AbstractTest {
 
     /**
      *
-     * When you send a Get to {@link RestInterface#updateActivityState(int, int, int, String, String)}
+     * When you send a Get to {@link RestInterface#updateActivityState(int, int, int, String)}
      * with an valid state for an invalid activity.
      * a bad request with an error message should be returned.
      */
     @Test
     public void testInvalidActivityUpdateActivity() {
         Response response = base.path("scenario/1/instance/72/activity/105")
-                .queryParam("state", "begin").request().put(Entity.json("[]"));
+                .queryParam("state", "begin").request().post(Entity.json("[]"));
         assertEquals("The Response code of getTerminationCondition was not 400",
                 400, response.getStatus());
         assertEquals("Get TerminationCondition does not return a JSON",
@@ -826,15 +838,15 @@ public class RestInterfaceTest extends AbstractTest {
 
     /**
      *
-     * When you send a Get to {@link RestInterface#updateActivityState(int, int, int, String, String)}
+     * When you send a Get to {@link RestInterface#updateActivityState(int, int, int, String)}
      * with an valid state and valid activity
      * then a 201 will be returned with a message inside a JSON-Object.
      */
-    @Test
+    //@Test
     public void testUpdateActivity() {
         Response response = base.path("scenario/1/instance/72/activity/186")
-                .queryParam("state", "begin").request().put(Entity.json("[]"));
-        assertEquals("The Response code of getTerminationCondition was not 202",
+                .queryParam("state", "begin").request().post(Entity.json("[]"));
+        assertEquals("The Response code of updateActivityState was not 202",
                 202, response.getStatus());
         assertEquals("Get TerminationCondition does not return a JSON",
                 MediaType.APPLICATION_JSON, response.getMediaType().toString());
@@ -843,8 +855,8 @@ public class RestInterfaceTest extends AbstractTest {
                 jsonEquals(response.readEntity(String.class))
                         .when(Option.IGNORING_ARRAY_ORDER));
         response = base.path("scenario/1/instance/72/activity/186")
-                .queryParam("state", "terminate").request().put(Entity.json("[]"));
-        assertEquals("The Response code of getTerminationCondition was not 202",
+                .queryParam("state", "terminate").request().post(Entity.json("[]"));
+        assertEquals("The Response code of updateActivityState was not 202",
                 202, response.getStatus());
         assertEquals("Get TerminationCondition does not return a JSON",
                 MediaType.APPLICATION_JSON, response.getMediaType().toString());
@@ -855,15 +867,15 @@ public class RestInterfaceTest extends AbstractTest {
     }
 
     /**
-     * When you send a Get to {@link RestInterface#updateActivityState(int, int, int, String, String)}
+     * When you send a Get to {@link RestInterface#updateActivityState(int, int, int, String)}
      * with an valid state and valid activity
      * then a 201 will be returned with a message inside a JSON-Object.
      */
     @Test
     public void testUpdateActivityWAttributes(){
         Response response = base.path("scenario/135/instance/808/activity/4518")
-                .queryParam("state", "begin").request().put(Entity.json("[]"));
-        assertEquals("The Response code of getTerminationCondition was not 202",
+                .queryParam("state", "begin").request().post(Entity.json("[]"));
+        assertEquals("The Response code of updateActivityState was not 202",
                 202, response.getStatus());
         assertEquals("Get TerminationCondition does not return a JSON",
                 MediaType.APPLICATION_JSON, response.getMediaType().toString());
@@ -872,8 +884,13 @@ public class RestInterfaceTest extends AbstractTest {
                 jsonEquals(response.readEntity(String.class))
                         .when(Option.IGNORING_ARRAY_ORDER));
         response = base.path("scenario/135/instance/808/activity/4518")
+                .request()
+                .put(Entity.json("{\"id\":1,\"value\":\"Test\"}"));
+        assertEquals("The Response code of updateActivityState was not 202",
+                202, response.getStatus());
+        response = base.path("scenario/135/instance/808/activity/4518")
                 .queryParam("state", "terminate").request()
-                .put(Entity.json("[{\"label\":\"Reiseplan\",\"id\":22,\"state\":\"init\",\"attributeConfiguration\":{\"entry\":[{\"key\":1,\"value\":\"{name=Preis, type=, value=400}\"}]}}]"));
+                .post(Entity.json("[{\"label\":\"Reiseplan\",\"id\":22,\"state\":\"init\",\"attributeConfiguration\":{\"entry\":[{\"key\":1,\"value\":\"{name=Preis, type=, value=400}\"}]}}]"));
         assertEquals("The Response code of getTerminationCondition was not 202",
                 202, response.getStatus());
         assertEquals("Get TerminationCondition does not return a JSON",
@@ -886,7 +903,7 @@ public class RestInterfaceTest extends AbstractTest {
 
     /**
      * Given is the Rest API
-     * When you send a PUT to {@link RestInterface#terminateScenarioInstance(int, int)}
+     * When you send a POST to {@link RestInterface#terminateScenarioInstance(int, int)}
      * with an invalid scenario id or instance id
      * then a 400 will be returned with an error message
      */
@@ -916,7 +933,7 @@ public class RestInterfaceTest extends AbstractTest {
 
     /**
      * Given is the Rest API
-     * When you send a PUT to {@link RestInterface#terminateScenarioInstance(int, int)}
+     * When you send a POST to {@link RestInterface#terminateScenarioInstance(int, int)}
      * with an valid scenario and instance id
      * the instance will be terminated.
      */
@@ -936,10 +953,10 @@ public class RestInterfaceTest extends AbstractTest {
 
     /**
      * Given: Is an invalid scenario instance
-     * when you send a get to {@link RestInterface#getInputDataObjects(int, int, int)}
+     * when you send a get to {@link RestInterface#getInputDataObjects(UriInfo, int, int, int)}
      * with an invalid scenario and instance id
      * a 404 with an error message is returned
-     *//*
+     */
     @Test
     public void testGetInputForInvalidScenario() {
         Response response = base.path("scenario/9987/instance/1234/activity/1/input")
@@ -956,10 +973,10 @@ public class RestInterfaceTest extends AbstractTest {
 
     /**
      * Given: Is an invalid activity instance
-     * when you send a get to {@link RestInterface#getInputDataObjects(int, int, int)}
+     * when you send a get to {@link RestInterface#getInputDataObjects(UriInfo, int, int, int)}
      * with an invalid activity instance id
      * a 404 with an error message is returned
-     *//*
+     */
     @Test
     public void testGetInputForInvalidActivity() {
         Response response = base.path("scenario/1/instance/72/activity/9999/input")
@@ -976,33 +993,33 @@ public class RestInterfaceTest extends AbstractTest {
 
     /**
      * Given: Is an valid activity instance
-     * when you send a get to {@link RestInterface#getInputDataObjects(int, int, int)}
+     * when you send a get to {@link RestInterface#getInputDataObjects(UriInfo, int, int, int)}
      * with a valid activity instance without input sets
-     * a 200 with an empty JSON array will be returned
-     *//*
+     * a 404 with an error message will be returned
+     */
     @Test
     public void testGetInputForWOInputSets() {
         Response response = base.path("scenario/135/instance/808/activity/4517/input")
                 .request().get();
-        assertEquals("The Response code of getInputDataObjects was not 200",
-                200, response.getStatus());
+        assertEquals("The Response code of getInputDataObjects was not 404",
+                404, response.getStatus());
         assertEquals("getInputDataObjects does not return a JSON",
                 MediaType.APPLICATION_JSON, response.getMediaType().toString());
         assertThat("The returned JSON does not contain the expected content",
                 response.readEntity(String.class),
-                jsonEquals("[]")
+                jsonEquals("{\"error\":\"There is no inputSet for this activity instance.\"}")
                         .when(Option.IGNORING_ARRAY_ORDER));
     }
 
     /**
      * Given: Is an invalid scenario instance
-     * when you send a get to {@link RestInterface#getOutputDataObjects(int, int, int)}
+     * when you send a get to {@link RestInterface#getOutputDataObjects(UriInfo, int, int, int)}
      * with an invalid scenario and instance id
      * a 404 with an error message is returned
-     *//*
+     */
     @Test
     public void testGetOutputForInvalidScenario() {
-        Response response = base.path("scenario/9987/instance/1234/activity/1/input")
+        Response response = base.path("scenario/0/instance/0/activity/1/output")
                 .request().get();
         assertEquals("The Response code of getOutputDataObjects was not 404",
                 404, response.getStatus());
@@ -1016,10 +1033,10 @@ public class RestInterfaceTest extends AbstractTest {
 
     /**
      * Given: Is an invalid activity instance
-     * when you send a get to {@link RestInterface#getOutputDataObjects(int, int, int)}
+     * when you send a get to {@link RestInterface#getOutputDataObjects(UriInfo, int, int, int)}
      * with an invalid activity instance id
      * a 404 with an error message is returned
-     *//*
+     */
     @Test
     public void testGetOutputInvalidActivity() {
         Response response = base.path("scenario/1/instance/72/activity/9999/output")
@@ -1036,21 +1053,129 @@ public class RestInterfaceTest extends AbstractTest {
 
     /**
      * Given: Is an valid activity instance
-     * when you send a get to {@link RestInterface#getInputDataObjects(int, int, int)}
+     * when you send a get to {@link RestInterface#getOutputDataObjects(UriInfo, int, int, int)}
      * with a valid activity instance without input sets
-     * a 200 with an empty JSON array will be returned
-     *//*
+     * a 404 with an error message will be returned
+     */
     @Test
     public void testGetOutputForWOOutputSets() {
         Response response = base.path("scenario/118/instance/704/activity/3749/output")
                 .request().get();
-        assertEquals("The Response code of getOutputDataObjects was not 200",
-                200, response.getStatus());
+        assertEquals("The Response code of getOutputDataObjects was not 404",
+                404, response.getStatus());
         assertEquals("getOutputDataObjects does not return a JSON",
                 MediaType.APPLICATION_JSON, response.getMediaType().toString());
         assertThat("The returned JSON does not contain the expected content",
                 response.readEntity(String.class),
-                jsonEquals("[]").when(Option.IGNORING_ARRAY_ORDER));
+                jsonEquals("{\"error\":\"There is no outputSet for this activity instance.\"}")
+                        .when(Option.IGNORING_ARRAY_ORDER));
     }
-*/
+    /**
+     *  when you send a get to {@link RestInterface#getOutputDataObjectsAndAttributes(int, int, int)}
+     *  with valid arguments
+     *  a 200 is returned with a JSONArray with JSONObjects for each dataObjectInstance
+     */
+    @Test
+    public void testGetOutputSetDataAttributes() {
+        Response response = base.path("scenario/135/instance/808/outputset/140")
+                .request().get();
+        assertEquals("The Response code of getOutputDataAttributes was not 200",
+                200, response.getStatus());
+        assertEquals("getOutputDataAttributes does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+        assertThat("The returned JSON does not contain the expected content",
+                response.readEntity(String.class),
+                jsonEquals("[{\"label\":\"Reiseplan\",\"id\":675,\"state\":\"Ziel festgelegt\",\"attributeConfiguration\":[{\"id\":1,\"name\":\"Preis\",\"type\":\"\",\"value\":\"250\"}]}]")
+                        .when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_EXTRA_FIELDS));
+    }
+    /**
+     * when you send a get to {@link RestInterface#getOutputDataObjectsAndAttributes(int, int, int)}
+     * with an invalid scenario/Instance
+     * a 404 with an error message is returned
+     */
+    @Test
+    public void testInvalidScenarioGetOutputSetDataAttributes() {
+        Response response = base.path("scenario/9987/instance/1234/outputset/140")
+                .request().get();
+        assertEquals("The Response code of getOutputDataObjects was not 404",
+                404, response.getStatus());
+        assertEquals("getOutputDataObjects does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+        assertThat("The returned JSON does not contain the expected content",
+                response.readEntity(String.class),
+                jsonEquals("{\"error\":\"There is no such scenario instance.\"}")
+                        .when(Option.IGNORING_ARRAY_ORDER));
+    }
+    /**
+     * when you send a get to {@link RestInterface#getOutputDataObjectsAndAttributes(int, int, int)}
+     * with an invalid ouptutSetID
+     * a 404 with an error message is returned
+     */
+    @Test
+    public void testInvalidOutputSetGetOutputSetDataAttributes() {
+        Response response = base.path("scenario/135/instance/808/outputset/1400")
+                .request().get();
+        assertEquals("The Response code of getOutputDataObjects was not 404",
+                404, response.getStatus());
+        assertEquals("getOutputDataObjects does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+        assertThat("The returned JSON does not contain the expected content",
+                response.readEntity(String.class),
+                jsonEquals("{\"error\":\"There is no such outputSet instance.\"}")
+                        .when(Option.IGNORING_ARRAY_ORDER));
+    }
+    /**
+     *  when you send a get to {@link RestInterface#getInputDataObjectsAndAttributes(int, int, int)}
+     *  with valid arguments
+     *  a 200 is returned with a JSONArray with JSONObjects for each dataObjectInstance
+     */
+    @Test
+    public void testGetInputSetDataAttributes() {
+        Response response = base.path("scenario/135/instance/808/inputset/139")
+                .request().get();
+        assertEquals("The Response code of getInputDataAttributes was not 200",
+                200, response.getStatus());
+        assertEquals("getDataAttributes does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+        assertThat("The returned JSON does not contain the expected content",
+                response.readEntity(String.class),
+                jsonEquals("[{\"label\":\"Reiseplan\",\"id\":675,\"state\":\"init\",\"attributeConfiguration\":[{\"id\":1,\"name\":\"Preis\",\"type\":\"\",\"value\":\"250\"}]}]")
+                        .when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_EXTRA_FIELDS));
+    }
+    /**
+     * when you send a get to {@link RestInterface#getInputDataObjectsAndAttributes(int, int, int)}
+     * with an invalid scenario/Instance
+     * a 404 with an error message is returned
+     */
+    @Test
+    public void testInvalidScenarioGetInputSetDataAttributes() {
+        Response response = base.path("scenario/9987/instance/1234/inputset/140")
+                .request().get();
+        assertEquals("The Response code of getInputDataObjects was not 404",
+                404, response.getStatus());
+        assertEquals("getInputDataObjects does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+        assertThat("The returned JSON does not contain the expected content",
+                response.readEntity(String.class),
+                jsonEquals("{\"error\":\"There is no such scenario instance.\"}")
+                        .when(Option.IGNORING_ARRAY_ORDER));
+    }
+    /**
+     * when you send a get to {@link RestInterface#getInputDataObjectsAndAttributes(int, int, int)}
+     * with an invalid inputSetID
+     * a 404 with an error message is returned
+     */
+    @Test
+    public void testInvalidInputSetGetInputSetDataAttributes() {
+        Response response = base.path("scenario/135/instance/808/inputset/1400")
+                .request().get();
+        assertEquals("The Response code of getInputDataObjects was not 404",
+                404, response.getStatus());
+        assertEquals("getInputDataObjects does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+        assertThat("The returned JSON does not contain the expected content",
+                response.readEntity(String.class),
+                jsonEquals("{\"error\":\"There is no such inputSet instance.\"}")
+                        .when(Option.IGNORING_ARRAY_ORDER));
+    }
 }

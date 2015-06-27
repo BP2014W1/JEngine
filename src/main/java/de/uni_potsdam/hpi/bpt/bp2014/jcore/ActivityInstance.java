@@ -8,42 +8,14 @@ import de.uni_potsdam.hpi.bpt.bp2014.database.DbReference;
 import java.util.LinkedList;
 import java.util.Map;
 
-
-/**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
-
-
 /**
  * Represents the activity instance.
  * It save the state of the activity in the state machine. It has an outgoing behavior and an incoming behavior.
  */
 
 public class ActivityInstance extends ControlNodeInstance {
-    private final TaskExecutionBehavior taskExecutionBehavior;
     private final ScenarioInstance scenarioInstance;
     private final String label;
-    private LinkedList<Integer> references;
-    private final boolean isMailTask;
-    private boolean automaticExecution;
-    private boolean canTerminate;
     /**
      * Database Connection objects.
      */
@@ -51,11 +23,15 @@ public class ActivityInstance extends ControlNodeInstance {
     private final DbActivityInstance dbActivityInstance = new DbActivityInstance();
     private final DbControlNode dbControlNode = new DbControlNode();
     private final DbReference dbReference = new DbReference();
+    private TaskExecutionBehavior taskExecutionBehavior;
+    private boolean isAutomaticTask;
+    private LinkedList<Integer> references;
+    private boolean automaticExecution;
+    private boolean canTerminate;
 
     /**
      * Creates and initializes a new activity instance.
-     * Reads the information for an existing activity instance from the database or creates a new one if no one
-     * exist in the database.
+     * Creates a new entry in the database for the new activity instance.
      *
      * @param controlNode_id      This is the database id from the control node.
      * @param fragmentInstance_id This is the database id from the fragment instance.
@@ -68,30 +44,70 @@ public class ActivityInstance extends ControlNodeInstance {
         this.label = dbControlNode.getLabel(controlNode_id);
         this.references = dbReference.getReferenceActivitiesForActivity(controlNode_id);
         scenarioInstance.getControlNodeInstances().add(this);
-        if (dbControlNodeInstance.existControlNodeInstance(controlNode_id, fragmentInstance_id)) {
-            //creates an existing Activity Instance using the database information
-            controlNodeInstance_id = dbControlNodeInstance.getControlNodeInstanceID(controlNode_id, fragmentInstance_id);
-            this.stateMachine = new ActivityStateMachine(controlNodeInstance_id, scenarioInstance, this);
-        } else {
-            //creates a new Activity Instance also in database
-            this.controlNodeInstance_id = dbControlNodeInstance.createNewControlNodeInstance(controlNode_id, "Activity", fragmentInstance_id);
-            dbActivityInstance.createNewActivityInstance(controlNodeInstance_id, "HumanTask", "init");
-            if (dbControlNode.getType(controlNode_id).equals("EmailTask")) {
+        //creates a new Activity Instance also in database
+        this.controlNodeInstance_id = dbControlNodeInstance.createNewControlNodeInstance(controlNode_id, "Activity", fragmentInstance_id);
+        switch (dbControlNode.getType(controlNode_id)) {
+            case "EmailTask":
+                dbActivityInstance.createNewActivityInstance(controlNodeInstance_id, "EmailTask", "init");
                 dbActivityInstance.setAutomaticExecution(controlNodeInstance_id, true);
-            }
-            this.stateMachine = new ActivityStateMachine(controlNodeInstance_id, scenarioInstance, this);
-            ((ActivityStateMachine) stateMachine).enableControlFlow();
+                break;
+            case "WebServiceTask":
+                dbActivityInstance.createNewActivityInstance(controlNodeInstance_id, "WebServiceTask", "init");
+                dbActivityInstance.setAutomaticExecution(controlNodeInstance_id, true);
+                break;
+            default:
+                dbActivityInstance.createNewActivityInstance(controlNodeInstance_id, "HumanTask", "init");
         }
+        this.stateMachine = new ActivityStateMachine(controlNodeInstance_id, scenarioInstance, this);
+        ((ActivityStateMachine) stateMachine).enableControlFlow();
+        this.initActivityInstance();
+    }
+
+    /**
+     * Creates and initializes a new activity instance.
+     * Reads the information for an existing activity instance from the database.
+     *
+     * @param controlNode_id      This is the database id from the control node.
+     * @param fragmentInstance_id This is the database id from the fragment instance.
+     * @param scenarioInstance    This is an instance from the class ScenarioInstance.
+     * @param instance_id         This is an id of the activity instance.
+     */
+    public ActivityInstance(int controlNode_id, int fragmentInstance_id, ScenarioInstance scenarioInstance, int instance_id) {
+        this.scenarioInstance = scenarioInstance;
+        this.controlNode_id = controlNode_id;
+        this.fragmentInstance_id = fragmentInstance_id;
+        this.label = dbControlNode.getLabel(controlNode_id);
+        this.references = dbReference.getReferenceActivitiesForActivity(controlNode_id);
+        scenarioInstance.getControlNodeInstances().add(this);
+        if (instance_id == -1) {
+            controlNodeInstance_id = dbControlNodeInstance.getControlNodeInstanceID(controlNode_id, fragmentInstance_id);
+        } else {
+            this.controlNodeInstance_id = instance_id;
+        }
+        this.stateMachine = new ActivityStateMachine(controlNodeInstance_id, scenarioInstance, this);
+        this.initActivityInstance();
+    }
+
+    /**
+     * Initialize other information for the instance.
+     */
+    private void initActivityInstance() {
         this.canTerminate = dbActivityInstance.getCanTerminate(controlNodeInstance_id);
         this.automaticExecution = dbActivityInstance.getAutomaticExecution(controlNodeInstance_id);
         this.incomingBehavior = new TaskIncomingControlFlowBehavior(this, scenarioInstance, stateMachine);
         this.outgoingBehavior = new TaskOutgoingControlFlowBehavior(controlNode_id, scenarioInstance, fragmentInstance_id, this);
-        if (dbControlNode.getType(controlNode_id).equals("EmailTask")) {
-            this.taskExecutionBehavior = new EmailTaskExecutionBehavior(controlNodeInstance_id, scenarioInstance, this);
-            this.isMailTask = true;
-        } else {
-            this.taskExecutionBehavior = new HumanTaskExecutionBehavior(controlNodeInstance_id, scenarioInstance, this);
-            this.isMailTask = false;
+        switch (dbControlNode.getType(controlNode_id)) {
+            case "EmailTask":
+                this.taskExecutionBehavior = new EmailTaskExecutionBehavior(controlNodeInstance_id, scenarioInstance, this);
+                this.isAutomaticTask = true;
+                break;
+            case "WebServiceTask":
+                this.taskExecutionBehavior = new WebServiceTaskExecutionBehavior(controlNodeInstance_id, scenarioInstance, this);
+                this.isAutomaticTask = true;
+                break;
+            default:
+                this.taskExecutionBehavior = new HumanTaskExecutionBehavior(controlNodeInstance_id, scenarioInstance, this);
+                this.isAutomaticTask = false;
         }
     }
 
@@ -109,8 +125,7 @@ public class ActivityInstance extends ControlNodeInstance {
             scenarioInstance.checkDataFlowEnabled();
             scenarioInstance.checkExecutingGateways(controlNode_id);
             taskExecutionBehavior.execute();
-            //System.out.println("Start Activity " + controlNode_id);
-            if(isMailTask){
+            if (isAutomaticTask) {
                 this.terminate();
             }
             return true;
@@ -152,10 +167,10 @@ public class ActivityInstance extends ControlNodeInstance {
     }
 
     public boolean terminate(int outputSet_id) {
-        if(canTerminate) {
-            boolean workingFine = ((ActivityStateMachine) stateMachine).terminate();
+        if (canTerminate) {
+            boolean workingFine = stateMachine.terminate();
             ((TaskOutgoingControlFlowBehavior) outgoingBehavior).terminateReferences();
-            ((TaskOutgoingControlFlowBehavior)outgoingBehavior).terminate(outputSet_id);
+            ((TaskOutgoingControlFlowBehavior) outgoingBehavior).terminate(outputSet_id);
             return workingFine;
         }
         return false;
@@ -164,8 +179,8 @@ public class ActivityInstance extends ControlNodeInstance {
     /**
      * sets the dataAttributes for an activity
      */
-    public void setDataAttributeValues(Map<Integer, String> values){
-        if(((ActivityStateMachine)stateMachine).state.equals("running")){
+    public void setDataAttributeValues(Map<Integer, String> values) {
+        if (((ActivityStateMachine) stateMachine).state.equals("running")) {
             taskExecutionBehavior.setDataAttributeValues(values);
         }
     }
@@ -179,42 +194,65 @@ public class ActivityInstance extends ControlNodeInstance {
 
     @Override
     public boolean skip() {
-        return ((ActivityStateMachine) stateMachine).skip();
+        return stateMachine.skip();
     }
 
+    // ************************************** Getter & Setter *************************//
+
     /**
-     * Getter & Setter
+     * @return
      */
     public TaskExecutionBehavior getTaskExecutionBehavior() {
         return taskExecutionBehavior;
     }
 
+    /**
+     * @return
+     */
     public ScenarioInstance getScenarioInstance() {
         return scenarioInstance;
     }
 
+    /**
+     * @return
+     */
     public String getLabel() {
         return label;
     }
 
+    /**
+     * @return
+     */
     public LinkedList<Integer> getReferences() {
         return references;
     }
 
-    public boolean getIsMailTask() {
-        return isMailTask;
+    /**
+     * @return
+     */
+    public boolean getIsAutomaticTask() {
+        return isAutomaticTask;
     }
 
-    public void setAutomaticExecution(boolean automaticExecution) {
-        this.automaticExecution = automaticExecution;
-        this.dbActivityInstance.setAutomaticExecution(controlNodeInstance_id, automaticExecution);
-    }
-
+    /**
+     * @return
+     */
     public boolean isAutomaticExecution() {
 
         return automaticExecution;
     }
 
+    /**
+     * @param automaticExecution
+     */
+    public void setAutomaticExecution(boolean automaticExecution) {
+        this.automaticExecution = automaticExecution;
+        this.dbActivityInstance.setAutomaticExecution(controlNodeInstance_id, automaticExecution);
+    }
+
+    /**
+     * @param canTerminate
+     */
     public void setCanTerminate(boolean canTerminate) {
         this.canTerminate = canTerminate;
         this.dbActivityInstance.setCanTerminate(controlNodeInstance_id, canTerminate);

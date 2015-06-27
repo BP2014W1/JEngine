@@ -11,13 +11,16 @@ import org.junit.Test;
 
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
 
 import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
 
 /**
  * This Class extends the {@link de.uni_potsdam.hpi.bpt.bp2014.AbstractTest}
@@ -28,10 +31,12 @@ import static org.junit.Assert.assertThat;
  * In order to stay independent from existing tests, the
  * database will be set up before and after the execution.
  * Define the database Properties inside the database_connection file.
+ *
+ *
  */
 public class RestInterfaceTest extends AbstractTest {
 
-    private static final String DEVELOPMENT_SQL_SEED_FILE = "src/main/resources/JEngineV2.sql";
+    private static final String DEVELOPMENT_SQL_SEED_FILE = "src/main/resources/JEngineV2_schema.sql";
     /**
      * Sets up the seed file for the test database.
      */
@@ -62,35 +67,136 @@ public class RestInterfaceTest extends AbstractTest {
     }
 
     /**
-     *
+     * tests if the GET for the ActivitiesLog returns correct values for a given scenarioInstance
      */
     @Test
     public void testGetActivitiesLog() {
-        Response response = base.path("scenario/1/instance/966/activities").request().get();
+        Response response = base.path("scenario/1/instance/1302/activities").request().get();
         assertThat("Get activities did not contain the expected information",
                 response.readEntity(String.class),
-                jsonEquals("{\"93\":{\"h.activityinstance_id\":6685,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready(ControlFlow)\",\"cn.label\":\"Activity1Fragment1\",\"h.newstate\":\"ready\"},\"92\":{\"h.activityinstance_id\":6685,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"init\",\"cn.label\":\"Activity1Fragment1\",\"h.newstate\":\"ready(ControlFlow)\"},\"95\":{\"h.activityinstance_id\":6686,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"init\",\"cn.label\":\"Activity1Fragment2\",\"h.newstate\":\"ready(ControlFlow)\"},\"94\":{\"h.activityinstance_id\":6686,\"h.scenarioinstance_id\":966,\"cn.label\":\"Activity1Fragment2\",\"h.newstate\":\"init\"},\"91\":{\"h.activityinstance_id\":6685,\"h.scenarioinstance_id\":966,\"cn.label\":\"Activity1Fragment1\",\"h.newstate\":\"init\"},\"102\":{\"h.activityinstance_id\":6685,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"running\",\"cn.label\":\"Activity1Fragment1\",\"h.newstate\":\"terminated\"},\"103\":{\"h.activityinstance_id\":6686,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready(ControlFlow)\",\"cn.label\":\"Activity1Fragment2\",\"h.newstate\":\"ready\"},\"100\":{\"h.activityinstance_id\":6688,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready(ControlFlow)\",\"cn.label\":\"ActivityFragment4\",\"h.newstate\":\"ready\"},\"101\":{\"h.activityinstance_id\":6685,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready\",\"cn.label\":\"Activity1Fragment1\",\"h.newstate\":\"running\"},\"98\":{\"h.activityinstance_id\":6688,\"h.scenarioinstance_id\":966,\"cn.label\":\"ActivityFragment4\",\"h.newstate\":\"init\"},\"99\":{\"h.activityinstance_id\":6688,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"init\",\"cn.label\":\"ActivityFragment4\",\"h.newstate\":\"ready(ControlFlow)\"},\"96\":{\"h.activityinstance_id\":6687,\"h.scenarioinstance_id\":966,\"cn.label\":\"ActivityFragment3\",\"h.newstate\":\"init\"},\"97\":{\"h.activityinstance_id\":6687,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"init\",\"cn.label\":\"ActivityFragment3\",\"h.newstate\":\"ready(ControlFlow)\"},\"110\":{\"h.activityinstance_id\":6690,\"h.scenarioinstance_id\":966,\"cn.label\":\"Activity2Fragment1\",\"h.newstate\":\"init\"},\"111\":{\"h.activityinstance_id\":6690,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"init\",\"cn.label\":\"Activity2Fragment1\",\"h.newstate\":\"ready(ControlFlow)\"},\"108\":{\"h.activityinstance_id\":6689,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"running\",\"cn.label\":\"Activity2Fragment1\",\"h.newstate\":\"terminated\"},\"109\":{\"h.activityinstance_id\":6687,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready(ControlFlow)\",\"cn.label\":\"ActivityFragment3\",\"h.newstate\":\"ready\"},\"106\":{\"h.activityinstance_id\":6689,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready(ControlFlow)\",\"cn.label\":\"Activity2Fragment1\",\"h.newstate\":\"ready\"},\"107\":{\"h.activityinstance_id\":6689,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready\",\"cn.label\":\"Activity2Fragment1\",\"h.newstate\":\"running\"},\"104\":{\"h.activityinstance_id\":6689,\"h.scenarioinstance_id\":966,\"cn.label\":\"Activity2Fragment1\",\"h.newstate\":\"init\"},\"105\":{\"h.activityinstance_id\":6689,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"init\",\"cn.label\":\"Activity2Fragment1\",\"h.newstate\":\"ready(ControlFlow)\"},\"119\":{\"h.activityinstance_id\":6686,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"running\",\"cn.label\":\"Activity1Fragment2\",\"h.newstate\":\"terminated\"},\"118\":{\"h.activityinstance_id\":6691,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready\",\"cn.label\":\"ActivityFragment3\",\"h.newstate\":\"ready(ControlFlow)\"},\"117\":{\"h.activityinstance_id\":6686,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready\",\"cn.label\":\"Activity1Fragment2\",\"h.newstate\":\"running\"},\"116\":{\"h.activityinstance_id\":6691,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready(ControlFlow)\",\"cn.label\":\"ActivityFragment3\",\"h.newstate\":\"ready\"},\"115\":{\"h.activityinstance_id\":6691,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"init\",\"cn.label\":\"ActivityFragment3\",\"h.newstate\":\"ready(ControlFlow)\"},\"114\":{\"h.activityinstance_id\":6691,\"h.scenarioinstance_id\":966,\"cn.label\":\"ActivityFragment3\",\"h.newstate\":\"init\"},\"113\":{\"h.activityinstance_id\":6687,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"running\",\"cn.label\":\"ActivityFragment3\",\"h.newstate\":\"terminated\"},\"112\":{\"h.activityinstance_id\":6687,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready\",\"cn.label\":\"ActivityFragment3\",\"h.newstate\":\"running\"},\"127\":{\"h.activityinstance_id\":6693,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready(ControlFlow)\",\"cn.label\":\"ActivityFragment4\",\"h.newstate\":\"ready\"},\"126\":{\"h.activityinstance_id\":6693,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"init\",\"cn.label\":\"ActivityFragment4\",\"h.newstate\":\"ready(ControlFlow)\"},\"125\":{\"h.activityinstance_id\":6693,\"h.scenarioinstance_id\":966,\"cn.label\":\"ActivityFragment4\",\"h.newstate\":\"init\"},\"124\":{\"h.activityinstance_id\":6688,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"running\",\"cn.label\":\"ActivityFragment4\",\"h.newstate\":\"terminated\"},\"123\":{\"h.activityinstance_id\":6688,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready\",\"cn.label\":\"ActivityFragment4\",\"h.newstate\":\"running\"},\"122\":{\"h.activityinstance_id\":6692,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"init\",\"cn.label\":\"Activity1Fragment2\",\"h.newstate\":\"ready(ControlFlow)\"},\"121\":{\"h.activityinstance_id\":6692,\"h.scenarioinstance_id\":966,\"cn.label\":\"Activity1Fragment2\",\"h.newstate\":\"init\"},\"120\":{\"h.activityinstance_id\":6690,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"ready(ControlFlow)\",\"cn.label\":\"Activity2Fragment1\",\"h.newstate\":\"ready\"}}\n").when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_EXTRA_FIELDS));
+                jsonEquals("{\"1\":{\"h.scenarioinstance_id\":1302,\"h.id\":1,\"h.activityinstance_id\":9261,\"cn.label\":\"Activity1Fragment1\",\"h.newstate\":\"init\"}}").when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_EXTRA_FIELDS));
     }
 
     /**
-     *
+     * tests if status Code is 404 when call fails
+     */
+    @Test
+    public void testGetActivitiesLogStatusCode404() {
+        Response response = base.path("scenario/0/instance/0/activities")
+                .request().get();
+        assertEquals("The Response code of getActivitiesLog was not 404",
+                400, response.getStatus());
+        assertEquals("getActivitiesLog does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+        assertThat("The returned JSON does not contain the expected content",
+                response.readEntity(String.class),
+                jsonEquals("{\"error\":\"The instance or scenario ID is incorrect\"}")
+                        .when(Option.IGNORING_ARRAY_ORDER));
+    }
+
+    /**
+     * tests if status Code is 200 when call was successful
+     */
+    @Test
+    public void testGetActivitiesLogStatusCode200() {
+        Response response = base.path("scenario/1/instance/1302/activities")
+                .request().get();
+        assertEquals("The Response code of getActivitiesLog was not 200",
+                200, response.getStatus());
+        assertEquals("getActivitiesLog does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+    }
+
+    /**
+     * tests if the GET for the terminated entries in ActivitiesLog returns correct values for a given scenarioInstance
      */
     @Test
     public void testGetActivitiesLogWithState() {
-        Response response = base.path("scenario/1/instance/966/activities").queryParam("state", "terminated").request().get();
+        Response response = base.path("scenario/1/instance/1302/activities").queryParam("state", "terminated").request().get();
         assertThat("Get activities did not contain the expected information",
                 response.readEntity(String.class),
-                jsonEquals("{\"119\":{\"h.activityinstance_id\":6686,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"running\",\"cn.label\":\"Activity1Fragment2\",\"h.newstate\":\"terminated\"},\"102\":{\"h.activityinstance_id\":6685,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"running\",\"cn.label\":\"Activity1Fragment1\",\"h.newstate\":\"terminated\"},\"113\":{\"h.activityinstance_id\":6687,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"running\",\"cn.label\":\"ActivityFragment3\",\"h.newstate\":\"terminated\"},\"108\":{\"h.activityinstance_id\":6689,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"running\",\"cn.label\":\"Activity2Fragment1\",\"h.newstate\":\"terminated\"},\"124\":{\"h.activityinstance_id\":6688,\"h.scenarioinstance_id\":966,\"h.oldstate\":\"running\",\"cn.label\":\"ActivityFragment4\",\"h.newstate\":\"terminated\"}}").when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_EXTRA_FIELDS));
+                jsonEquals("{\"18\":{\"h.scenarioinstance_id\":1302,\"h.id\":18,\"h.activityinstance_id\":9265,\"cn.label\":\"Activity2Fragment1\",\"h.oldstate\":\"running\",\"h.newstate\":\"terminated\"}}").when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_EXTRA_FIELDS));
     }
     
     /**
-     *
+     * tests if the GET for the DataObjectlog returns correct values for a given scenarioInstance
      */
-    //@Test
+    @Test
     public void testGetDataObjectsLog() {
-        Response response = base.path("scenario/1/instance/966/dataobjects").request().get();
+        Response response = base.path("scenario/1/instance/1302/dataobjects").request().get();
         assertThat("Get activities did not contain the expected information",
                 response.readEntity(String.class),
-                jsonEquals("{\"69\":{\"old_state_name\":\"\",\"scenarioinstance_id\":966,\"new_state_id\":1,\"new_state_name\":\"init\",\"name\":\"object1\",\"dataobjectinstance_id\":744},\"70\":{\"old_state_name\":\"\",\"scenarioinstance_id\":966,\"new_state_id\":5,\"new_state_name\":\"init\",\"name\":\"object2\",\"dataobjectinstance_id\":745},\"71\":{\"old_state_name\":\"init\",\"scenarioinstance_id\":966,\"new_state_id\":2,\"new_state_name\":\"bearbeitet\",\"name\":\"object1\",\"old_state_id\":1,\"dataobjectinstance_id\":744},\"72\":{\"old_state_name\":\"init\",\"scenarioinstance_id\":966,\"new_state_id\":6,\"new_state_name\":\"fertig\",\"name\":\"object2\",\"old_state_id\":5,\"dataobjectinstance_id\":745},\"73\":{\"old_state_name\":\"bearbeitet\",\"scenarioinstance_id\":966,\"new_state_id\":3,\"new_state_name\":\"gepr?ft\",\"name\":\"object1\",\"old_state_id\":2,\"dataobjectinstance_id\":744}}").when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_EXTRA_FIELDS));
+                jsonEquals("{\"3\":{\"h.scenarioinstance_id\":1302,\"h.id\":3,\"h.oldstate_id\":1,\"h.newstate_id\":2,\"h.dataobjectinstance_id\":1058,\"newstate_name\":\"bearbeitet\",\"oldstate_name\":\"init\",\"do.name\":\"Bestellung\"}}").when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_EXTRA_FIELDS));
+    }
+
+    /**
+     * tests if status Code is 404 when call fails
+     */
+    @Test
+    public void testGetDataObjectsLogStatusCode404() {
+        Response response = base.path("scenario/0/instance/0/dataobjects")
+                .request().get();
+        assertEquals("The Response code of getDataObjectsLog was not 400",
+                400, response.getStatus());
+        assertEquals("getDataObjectsLog does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+        assertThat("The returned JSON does not contain the expected content",
+                response.readEntity(String.class),
+                jsonEquals("{\"error\":\"The instance or scenario ID is incorrect\"}")
+                        .when(Option.IGNORING_ARRAY_ORDER));
+    }
+
+    /**
+     * tests if status Code is 200 when call was successful
+     */
+    @Test
+    public void testGetDataObjectsLogStatusCode200() {
+        Response response = base.path("scenario/1/instance/1302/dataobjects")
+                .request().get();
+        assertEquals("The Response code of getDataObjectsLog was not 200",
+                200, response.getStatus());
+        assertEquals("getDataObjectsLog does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+    }
+
+    /**
+     * tests if the GET for the DataAttributesLog returns correct values for a given scenarioInstance
+     */
+    @Test
+    public void testGetDataAttributesLog() {
+        Response response = base.path("scenario/156/instance/1329/attributes").request().get();
+        assertThat("Get activities did not contain the expected information",
+                response.readEntity(String.class),
+                jsonEquals("{\"1\":{\"h.scenarioinstance_id\":1329,\"da.name\":\"Attribut1\",\"h.id\":1,\"h.dataattributeinstance_id\":150,\"h.newvalue\":\"\",\"do.name\":\"DO\"}}").when(Option.IGNORING_ARRAY_ORDER).when(Option.IGNORING_EXTRA_FIELDS));
+    }
+
+    /**
+     * tests if status Code is 404 when call fails
+     */
+    @Test
+    public void testGetDataAttributesLogStatusCode404() {
+        Response response = base.path("scenario/0/instance/0/attributes")
+                .request().get();
+        assertEquals("The Response code of getDataAttributesLog was not 404",
+                400, response.getStatus());
+        assertEquals("getDataAttributesLog does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
+        assertThat("The returned JSON does not contain the expected content",
+                response.readEntity(String.class),
+                jsonEquals("{\"error\":\"The instance or scenario ID is incorrect\"}")
+                        .when(Option.IGNORING_ARRAY_ORDER));
+    }
+
+    /**
+     * tests if status Code is 200 when call was successful
+     */
+    @Test
+    public void testGetDataAttributesLogStatusCode200() {
+        Response response = base.path("scenario/1/instance/1302/attributes")
+                .request().get();
+        assertEquals("The Response code of getDataAttributesLog was not 200",
+                200, response.getStatus());
+        assertEquals("getDataAttributesLog does not return a JSON",
+                MediaType.APPLICATION_JSON, response.getMediaType().toString());
     }
 }

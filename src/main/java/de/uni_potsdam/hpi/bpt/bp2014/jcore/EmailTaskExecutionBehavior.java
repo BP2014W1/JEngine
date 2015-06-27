@@ -1,22 +1,23 @@
 package de.uni_potsdam.hpi.bpt.bp2014.jcore;
 
 import de.uni_potsdam.hpi.bpt.bp2014.database.DbEmailConfiguration;
+import de.uni_potsdam.hpi.bpt.bp2014.database.DbState;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
+import org.apache.log4j.Logger;
 
-/**
- * Created by jaspar.mang on 28.01.15.
- */
+
 public class EmailTaskExecutionBehavior extends TaskExecutionBehavior {
+    static Logger log = Logger.getLogger(EmailTaskExecutionBehavior.class.getName());
+    private final int controlNode_id;
+    private final DbEmailConfiguration emailConfiguration = new DbEmailConfiguration();
     private int port;
     private String serverAddress;
     private String receiverMail;
     private String sendMail;
     private String subject;
     private String message;
-    private final int controlNode_id;
-    private final DbEmailConfiguration emailConfiguration = new DbEmailConfiguration();
 
 
     /**
@@ -36,7 +37,7 @@ public class EmailTaskExecutionBehavior extends TaskExecutionBehavior {
         this.setValues();
         this.sendMail();
         this.setCanTerminate(true);
-        ((ActivityInstance)controlNodeInstance).setCanTerminate(true);
+        this.setCanTerminate(true);
     }
 
     /**
@@ -52,17 +53,22 @@ public class EmailTaskExecutionBehavior extends TaskExecutionBehavior {
         this.setDataAttributes();
     }
 
-    private void setDataAttributes(){
-        for(DataAttributeInstance dataAttributeInstance : scenarioInstance.getDataAttributeInstances().values()){
+    private void setDataAttributes() {
+        for (DataAttributeInstance dataAttributeInstance : scenarioInstance.getDataAttributeInstances().values()) {
             message = message.replace(
                     "#" + (dataAttributeInstance.getDataObjectInstance()).getName()
-                            + "."+dataAttributeInstance.getName(), dataAttributeInstance.getValue().toString());
+                            + "." + dataAttributeInstance.getName(), dataAttributeInstance.getValue().toString());
             subject = subject.replace(
                     "#" + (dataAttributeInstance.getDataObjectInstance()).getName()
                             + "." + dataAttributeInstance.getName(), dataAttributeInstance.getValue().toString());
             receiverMail = receiverMail.replace(
                     "#" + (dataAttributeInstance.getDataObjectInstance()).getName()
-                            + "."+dataAttributeInstance.getName(), dataAttributeInstance.getValue().toString());
+                            + "." + dataAttributeInstance.getName(), dataAttributeInstance.getValue().toString());
+        }
+        DbState dbState = new DbState();
+        for (DataObjectInstance dataObjectInstance : scenarioInstance.getDataObjectInstances()) {
+            message = message.replace(
+                    "$" + dataObjectInstance.getName(), dbState.getStateName(dataObjectInstance.getState_id()));
         }
     }
 
@@ -81,7 +87,7 @@ public class EmailTaskExecutionBehavior extends TaskExecutionBehavior {
             email.addTo(receiverMail);
             email.send();
         } catch (EmailException e) {
-            e.printStackTrace();
+            log.error("Error by sending e-Mail:", e);
         }
     }
 }

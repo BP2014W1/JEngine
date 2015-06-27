@@ -2,27 +2,6 @@ package de.uni_potsdam.hpi.bpt.bp2014.database;
 
 
 /**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
- */
-
-/**
  * This class is the representation of a fragment instance in the database.
  * It provides the functionality to create and terminate a fragment instance as well as checking the existence of a fragment instance.
  */
@@ -30,7 +9,7 @@ public class DbFragmentInstance extends DbObject {
     /**
      * This method checks if a fragment is present in the database.
      *
-     * @param fragment_id This is the database ID of a fragment.
+     * @param fragment_id         This is the database ID of a fragment.
      * @param scenarioInstance_id This is the database ID of a scenario instance.
      * @return true if the fragment exists else false.
      */
@@ -42,7 +21,7 @@ public class DbFragmentInstance extends DbObject {
     /**
      * This method creates and saves a new fragment instance to the database.
      *
-     * @param fragment_id This is the database ID of a fragment.
+     * @param fragment_id         This is the database ID of a fragment.
      * @param scenarioInstance_id This is the database ID of a scenario instance.
      * @return -1 if something went wrong else the database ID of the newly created fragment instance.
      */
@@ -54,7 +33,7 @@ public class DbFragmentInstance extends DbObject {
     /**
      * This method gives you the fragment instance ID of a fragment from a specific scenario instance.
      *
-     * @param fragment_id This is the database ID of a fragment.
+     * @param fragment_id         This is the database ID of a fragment.
      * @param scenarioInstance_id This is the database ID of a scenario instance.
      * @return the database ID of the fragment instance if existing else -1.
      */

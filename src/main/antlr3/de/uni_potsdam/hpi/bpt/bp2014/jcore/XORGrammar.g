@@ -14,8 +14,8 @@ package de.uni_potsdam.hpi.bpt.bp2014.jcore;
 package de.uni_potsdam.hpi.bpt.bp2014.jcore;
 }
 
-fragment STRING: '$'?('A'..'Z' | 'a'..'z' | '0'..'9')+;
-COMPARISON: '=' | '<' | '>' | '<=' | '>=';
+fragment STRING: '#'?('A'..'Z' | 'a'..'z' | '0'..'9')+;
+COMPARISON: '!'?('=' | '<' | '>' | '<=' | '>=');
 fragment DOT: '.';
 OPERATOR: ' & ' | ' | ' | '&' | '|';
 NAME: STRING | STRING  DOT STRING;

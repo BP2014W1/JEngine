@@ -2,15 +2,15 @@ package de.uni_potsdam.hpi.bpt.bp2014.database;
 
 
 
-import de.uni_potsdam.hpi.bpt.bp2014.database.DbDataObject;
+import de.uni_potsdam.hpi.bpt.bp2014.AbstractDatabaseDependentTest;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 /**
- * Created by jaspar.mang on 12.01.15.
+ * T
  */
-public class DbDataObjectTest {
+public class DbDataObjectTest extends AbstractDatabaseDependentTest {
 
     @Test
     public void testGetDataObjectsForScenario(){

@@ -1,34 +1,19 @@
 package de.uni_potsdam.hpi.bpt.bp2014.jcomparser;
 
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+
 /**
- * ********************************************************************************
- * <p/>
- * _________ _______  _        _______ _________ _        _______
- * \__    _/(  ____ \( (    /|(  ____ \\__   __/( (    /|(  ____ \
- * )  (  | (    \/|  \  ( || (    \/   ) (   |  \  ( || (    \/
- * |  |  | (__    |   \ | || |         | |   |   \ | || (__
- * |  |  |  __)   | (\ \) || | ____    | |   | (\ \) ||  __)
- * |  |  | (      | | \   || | \_  )   | |   | | \   || (
- * |\_)  )  | (____/\| )  \  || (___) |___) (___| )  \  || (____/\
- * (____/   (_______/|/    )_)(_______)\_______/|/    )_)(_______/
- * <p/>
- * ******************************************************************
- * <p/>
- * Copyright © All Rights Reserved 2014 - 2015
- * <p/>
- * Please be aware of the License. You may found it in the root directory.
- * <p/>
- * **********************************************************************************
+ *
  */
-
-
 public class Seed {
+    static Logger log = Logger.getLogger(Seed.class.getName());
 
     public void getDBcontent() {
     }
@@ -37,8 +22,8 @@ public class Seed {
     }
 
     /**
-     * @param id some id..
-     * @return
+     * @param id some some id.
+     * @return Array list
      */
     public ArrayList<Integer> getAllActivityIDByFragmentID(int id) {
 
@@ -69,7 +54,7 @@ public class Seed {
 
         } catch (SQLException se) {
             //Handle errors for JDBC
-            se.printStackTrace();
+            log.error("SQL Error!:", se);
         } finally {
             //finally block used to close resources
             try {
@@ -81,7 +66,7 @@ public class Seed {
                 if (conn != null)
                     conn.close();
             } catch (SQLException se) {
-                se.printStackTrace();
+                log.error("SQL Error!:", se);
             }
         }
 

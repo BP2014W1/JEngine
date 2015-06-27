@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+
 /**
  * An Abstract class for Rest Tests
  */
@@ -17,7 +18,7 @@ public abstract class AbstractTest extends JerseyTest {
     /**
      * The Database Seed file.
      */
-    public static String TEST_SQL_SEED_FILE = "src/main/resources/JEngineV2.sql";
+    public static String TEST_SQL_SEED_FILE = "src/test/resources/JEngineV2_AcceptanceTests.sql";
 
     /**
      * Sets up the database for RestTests.
